@@ -53,25 +53,12 @@ abstract class SDIS62_Oauth_Consumer_Controller_Abstract extends Zend_Controller
         {
             $this->config_file = APPLICATION_PATH . DIRECTORY_SEPARATOR . "configs" . DIRECTORY_SEPARATOR . "secret.ini";
         }
-    
-        // check if config_file exists
-        if(!file_exists($this->config_file))
-        {
-            throw new Zend_Exception("Configuration file does not exists (" . $this->config_file . ")");
-        }
-        
+
         // retrieve the configuration from config_file
-        $secret_config = new Zend_Config_Ini($this->config_file, APPLICATION_ENV);
-        
-        // Check if config is an array
-        $configuration_parameters_key = $this->configuration_parameters_key;
-        if(!is_array($secret_config->$configuration_parameters_key->toArray()))
-        {
-            throw new Zend_Exception("Configuration parameters is not an array. '" . $configuration_parameters_key . "' key used.");
-        }
-        
+        $secret_oauth_config = $this->_helper->getConfigurationValues($this->config_file, $this->configuration_parameters_key);
+
         // Initialize consumer object with config array
-		$this->consumer = new Zend_Oauth_Consumer($secret_config->$configuration_parameters_key->toArray());
+		$this->consumer = new Zend_Oauth_Consumer($secret_oauth_config);
     }
 
     /**
