@@ -31,7 +31,7 @@ class SDIS62_Controller_Action_Helper_GetConfigurationValues extends Zend_Contro
         }
         
         // retrieve the configuration from config_file
-        $config = new Zend_Config_Ini($this->config_file, APPLICATION_ENV);
+        $config = new Zend_Config_Ini($config_file, APPLICATION_ENV);
         
         // get the key based configuration values
         $key_configuration_values = $configuration_parameters_key == null ? $secret_config : $secret_config->$configuration_parameters_key;
