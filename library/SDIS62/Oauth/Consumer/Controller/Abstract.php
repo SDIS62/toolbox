@@ -49,21 +49,22 @@ abstract class SDIS62_Oauth_Consumer_Controller_Abstract extends Zend_Controller
      */
     public function init()
     {
-        if($config_file == null)
+        if($this->config_file == null)
         {
-            $config_file = APPLICATION_PATH . DIRECTORY_SEPARATOR . "configs" . DIRECTORY_SEPARATOR . "secret.ini";
+            $this->config_file = APPLICATION_PATH . DIRECTORY_SEPARATOR . "configs" . DIRECTORY_SEPARATOR . "secret.ini";
         }
     
         // check if config_file exists
-        if(!file_exists($config_file))
+        if(!file_exists($this->config_file))
         {
-            throw new Zend_Exception("Configuration file does not exists (" . $config_file . ")");
+            throw new Zend_Exception("Configuration file does not exists (" . $this->config_file . ")");
         }
         
         // retrieve the configuration from config_file
-        $secret_config = new Zend_Config_Ini($config_file, APPLICATION_ENV);
+        $secret_config = new Zend_Config_Ini($this->config_file, APPLICATION_ENV);
         
         // Check if config is an array
+        $configuration_parameters_key = $this->configuration_parameters_key;
         if(!is_array($this->secret_config->$configuration_parameters_key->toArray()))
         {
             throw new Zend_Exception("Configuration parameters is not an array. '" . $configuration_parameters_key . "' key used.");
@@ -94,6 +95,11 @@ abstract class SDIS62_Oauth_Consumer_Controller_Abstract extends Zend_Controller
 
             // redirect the user to user module
             $this->consumer->redirect();
+            return;
+        }
+        else
+        {
+            $this->_helper->redirector->gotoUrl($this->redirection_url);
         }
     }
 
@@ -126,11 +132,11 @@ abstract class SDIS62_Oauth_Consumer_Controller_Abstract extends Zend_Controller
                 $session->REQUEST_TOKEN = null;
                 
                 // redirection
-                $this->_helper->redirector->gotoUrl($redirection_url);
+                $this->_helper->redirector->gotoUrl($this->redirection_url);
             }
             else
             {
-                throw new Zend_Oauth_Exception("The token doesn't match the request token received in step 1.");
+                throw new Zend_Oauth_Exception("The token doesn't match the request token.");
             }
         }
     }
