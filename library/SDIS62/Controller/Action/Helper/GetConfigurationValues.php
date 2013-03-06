@@ -3,16 +3,16 @@
  * SDIS 62
  *
  * @category   SDIS62
- * @package    SDIS62_Controller_Helper_GetConfigurationValues
+ * @package    SDIS62_Controller_Action_Helper_GetConfigurationValues
  */
  
  /**
  * Class for GetConfigurationValues Action Helper instance.
  *
  * @category   SDIS62
- * @package    SDIS62_Controller_Helper_GetConfigurationValues
+ * @package    SDIS62_Controller_Action_Helper_GetConfigurationValues
  */
-class SDIS62_Controller_Helper_GetConfigurationValues extends Zend_Controller_Action_Helper_Abstract
+class SDIS62_Controller_Action_Helper_GetConfigurationValues extends Zend_Controller_Action_Helper_Abstract
 {
 
     /**
