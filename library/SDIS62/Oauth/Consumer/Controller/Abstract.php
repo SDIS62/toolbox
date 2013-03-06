@@ -26,7 +26,7 @@ abstract class SDIS62_Oauth_Consumer_Controller_Abstract extends Zend_Controller
      *
      * @var string
      */
-	protected $config_file = APPLICATION_PATH . DIRECTORY_SEPARATOR . "configs" . DIRECTORY_SEPARATOR . "secret.ini";
+	protected $config_file = null;
     
     /**
      * The configuration parameters key.
@@ -49,6 +49,11 @@ abstract class SDIS62_Oauth_Consumer_Controller_Abstract extends Zend_Controller
      */
     public function init()
     {
+        if($config_file == null)
+        {
+            $config_file = APPLICATION_PATH . DIRECTORY_SEPARATOR . "configs" . DIRECTORY_SEPARATOR . "secret.ini";
+        }
+    
         // check if config_file exists
         if(!file_exists($config_file))
         {
