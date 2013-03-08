@@ -59,20 +59,6 @@ abstract class SDIS62_Oauth_Consumer_Controller_Abstract extends Zend_Controller
 
         // Initialize consumer object with config array
 		$this->consumer = new Zend_Oauth_Consumer($secret_oauth_config);
-        
-        // Configure the default redirection
-        try
-        {
-            $action = $this->redirection_url[0]; // At least one value in redirection_url
-            $controller = array_key_exists($this->redirection_url[1]) ? $this->redirection_url[1] : null;
-            $module = array_key_exists($this->redirection_url[2]) ? $this->redirection_url[2] : null;
-            $params = array_key_exists($this->redirection_url[3]) && is_array($this->redirection_url[3]) ? $this->redirection_url[3] : array();
-            $this->_helper->redirector->setGotoSimple($action, $controller, $module, $params);
-        }
-        catch(Zend_Exception $exception)
-        {
-            throw new Zend_Exception("There is a problem with redirection_url.");
-        }
     }
 
     /**
@@ -100,7 +86,12 @@ abstract class SDIS62_Oauth_Consumer_Controller_Abstract extends Zend_Controller
         }
         else
         {
-            $this->_helper->redirector->redirectAndExit();
+            $this->_helper->redirector->gotoSimple(
+               $this->redirection_url[0],
+                array_key_exists(1, $this->redirection_url) ? $this->redirection_url[1] : null,
+                array_key_exists(2, $this->redirection_url) ? $this->redirection_url[2] : null,
+                array_key_exists(3, $this->redirection_url) && is_array($this->redirection_url[3]) ? $this->redirection_url[3] : array()
+           );
         }
     }
 
@@ -133,7 +124,12 @@ abstract class SDIS62_Oauth_Consumer_Controller_Abstract extends Zend_Controller
                 $session->REQUEST_TOKEN = null;
                 
                 // redirection
-                $this->_helper->redirector->redirectAndExit();
+                $this->_helper->redirector->gotoSimple(
+                   $this->redirection_url[0],
+                    array_key_exists(1, $this->redirection_url) ? $this->redirection_url[1] : null,
+                    array_key_exists(2, $this->redirection_url) ? $this->redirection_url[2] : null,
+                    array_key_exists(3, $this->redirection_url) && is_array($this->redirection_url[3]) ? $this->redirection_url[3] : array()
+               );
             }
             else
             {
