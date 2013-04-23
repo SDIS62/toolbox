@@ -29,13 +29,6 @@ abstract class SDIS62_Oauth_Consumer_Controller_Abstract extends Zend_Controller
 	protected $config_file = null;
     
     /**
-     * The configuration parameters key.
-     *
-     * @var string
-     */
-	protected $configuration_parameters_key = null;
-    
-    /**
      * Array which represents the redirection URL after obtain an access token. ($action, $controller = null, $module = null, array $params = array())
      *
      * @var array
@@ -51,11 +44,16 @@ abstract class SDIS62_Oauth_Consumer_Controller_Abstract extends Zend_Controller
     {
         if($this->config_file == null)
         {
-            $this->config_file = APPLICATION_PATH . DIRECTORY_SEPARATOR . "configs" . DIRECTORY_SEPARATOR . "secret.ini";
+            $this->config_file = new Zend_Config_Ini(APPLICATION_PATH . DIRECTORY_SEPARATOR . "configs" . DIRECTORY_SEPARATOR . "secret.ini", APPLICATION_ENV);
         }
 
         // retrieve the configuration from config_file
-        $secret_oauth_config = $this->_helper->getConfigurationValues($this->config_file, $this->configuration_parameters_key);
+        $secret_oauth_config = array(
+            'callbackUrl' => $this->config_file->oauth->callback,
+            'siteUrl' => $this->config_file->oauth->siteurl,
+			'consumerKey' => $this->config_file->oauth->consumerkey, // consumer key
+			'consumerSecret' => $this->config_file->oauth->consumersecret // consumer secret
+        );
 
         // Initialize consumer object with config array
 		$this->consumer = new Zend_Oauth_Consumer($secret_oauth_config);
