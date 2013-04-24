@@ -131,7 +131,23 @@ abstract class SDIS62_Oauth_Consumer_Controller_Abstract extends Zend_Controller
             }
             else
             {
-                throw new Zend_Oauth_Exception("The token doesn't match the request token.");
+                // get the instance of auth
+                $auth = Zend_Auth::getInstance();
+        
+                // clear the identity
+                $auth->clearIdentity();
+                
+                // Forget the session lifetime
+                Zend_Session::forgetMe();
+                        
+                $this->_helper->flashMessenger(array(
+                    'context' => 'error',
+                    'title' => 'Hum ...',
+                    'message' => 'Le token ne correspond pas.'
+                ));
+                
+                // redirect to index
+                $this->_helper->redirector("index");
             }
         }
     }
