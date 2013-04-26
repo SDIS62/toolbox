@@ -151,4 +151,25 @@ abstract class SDIS62_Oauth_Consumer_Controller_Abstract extends Zend_Controller
             }
         }
     }
+    
+    public function logoutAction()
+    {
+        // get the instance of auth
+        $auth = Zend_Auth::getInstance();
+
+        // clear the identity
+        $auth->clearIdentity();
+        
+        // Forget the session lifetime
+        Zend_Session::forgetMe();
+                
+        $this->_helper->flashMessenger(array(
+            'context' => 'success',
+            'title' => 'Au revoir !',
+            'message' => 'Vous avez été correctement deconnecté.'
+        ));
+        
+        // redirect to index
+        $this->_helper->redirector("index", "index");
+    }
 }
