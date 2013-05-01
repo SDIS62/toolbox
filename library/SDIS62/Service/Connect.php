@@ -152,7 +152,7 @@ class SDIS62_Service_Connect
      */
     public function getNavigation()
     {
-		return Zend_Json::decode($this->getRestClient()->navigation()->get(), Zend_Json::TYPE_OBJECT);
+		return Zend_Json::decode($this->getRestClient()->navigation()->get(), Zend_Json::TYPE_ARRAY);
     }
     
     /**
