@@ -131,7 +131,7 @@ class SDIS62_Service_Connect
      * @throws Exception\DomainException if unable to decode JSON payload
      * @return object
      */
-    public function getApplication()
+    public function getApplications()
     {
         $this->init();
         $response = $this->get('user/applications');
@@ -145,7 +145,7 @@ class SDIS62_Service_Connect
      * @throws Exception\DomainException if unable to decode JSON payload
      * @return object
      */
-    public function account()
+    public function getNavigation()
     {
         $this->init();
         $response = $this->get('user/navigation');
@@ -159,7 +159,7 @@ class SDIS62_Service_Connect
      * @throws Exception\DomainException if unable to decode JSON payload
      * @return object
      */
-    public function account()
+    public function getPhoneDevice()
     {
         $this->init();
         $response = $this->get('user/phone_device');
