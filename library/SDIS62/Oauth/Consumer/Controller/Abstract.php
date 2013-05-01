@@ -33,7 +33,7 @@ abstract class SDIS62_Oauth_Consumer_Controller_Abstract extends Zend_Controller
      *
      * @var array
      */
-	protected $redirection_url = array("index", "index");
+	protected $stock_access_token_url = array("index", "index");
 
     /**
      * Initialize object
@@ -66,6 +66,15 @@ abstract class SDIS62_Oauth_Consumer_Controller_Abstract extends Zend_Controller
      */
     public function indexAction()
     {
+        // If there is a identity with an access token
+        $auth = Zend_Auth::getInstance();
+        
+        // If we have an access token, redirect
+        if($auth->hasIdentity() && isset($auth->getIdentity()->ACCESS_TOKEN))
+        {
+            $this->_helper->redirector("index", "index");
+        }
+        
         // get my session
 		$session = new Zend_Session_Namespace();
 
@@ -108,10 +117,10 @@ abstract class SDIS62_Oauth_Consumer_Controller_Abstract extends Zend_Controller
             
             // redirection
             $this->_helper->redirector->gotoSimple(
-               $this->redirection_url[0],
-                array_key_exists(1, $this->redirection_url) ? $this->redirection_url[1] : null,
-                array_key_exists(2, $this->redirection_url) ? $this->redirection_url[2] : null,
-                array_key_exists(3, $this->redirection_url) && is_array($this->redirection_url[3]) ? $this->redirection_url[3] : array()
+               $this->stock_access_token_url[0],
+                array_key_exists(1, $this->stock_access_token_url) ? $this->stock_access_token_url[1] : null,
+                array_key_exists(2, $this->stock_access_token_url) ? $this->stock_access_token_url[2] : null,
+                array_key_exists(3, $this->stock_access_token_url) && is_array($this->stock_access_token_url[3]) ? $this->stock_access_token_url[3] : array()
            );
         }
         else
@@ -119,7 +128,13 @@ abstract class SDIS62_Oauth_Consumer_Controller_Abstract extends Zend_Controller
             throw new Exception("Bad Token.", 500);
         }
     }
-    
+
+
+    /**
+     * Dispatch to logout the user and discard access token
+     *
+     * @return void
+     */      
     public function logoutAction()
     {
         // get the instance of auth
@@ -127,13 +142,7 @@ abstract class SDIS62_Oauth_Consumer_Controller_Abstract extends Zend_Controller
 
         // clear the identity
         $auth->clearIdentity();
-                
-        $this->_helper->flashMessenger(array(
-            'context' => 'success',
-            'title' => 'Au revoir !',
-            'message' => 'Vous avez été correctement deconnecté.'
-        ));
-        
+
         // redirect to index
         $this->_helper->redirector("index", "index");
     }
