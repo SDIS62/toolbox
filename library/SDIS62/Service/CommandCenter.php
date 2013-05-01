@@ -134,7 +134,7 @@ class SDIS62_Service_CommandCenter extends Zend_Service_Abstract
         
         // Set the request
 		$response = Zend_Json::decode(
-            $rest_user->getApplicationByConsumerKey($id_application)->get(), 
+            $rest_user->getApplicationByConsumerKey($consumer_key)->get(), 
             Zend_Json::TYPE_OBJECT
         );
 		

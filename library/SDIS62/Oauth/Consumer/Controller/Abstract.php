@@ -68,29 +68,17 @@ abstract class SDIS62_Oauth_Consumer_Controller_Abstract extends Zend_Controller
     {
         // get my session
 		$session = new Zend_Session_Namespace();
+
+        // Get request_token
+        $token = $this->consumer->getRequestToken();
+
+        // we store the request token
+        $session->REQUEST_TOKEN = $token;
+
+        // redirect the user to user module
+        $this->consumer->redirect();
         
-        // if we have not request_token
-        if(!$session->ACCESS_TOKEN)
-        {
-            // Get request_token
-            $token = $this->consumer->getRequestToken();
-
-            // we store the request token
-            $session->REQUEST_TOKEN = $token;
-
-            // redirect the user to user module
-            $this->consumer->redirect();
-            return;
-        }
-        else
-        {
-            $this->_helper->redirector->gotoSimple(
-               $this->redirection_url[0],
-                array_key_exists(1, $this->redirection_url) ? $this->redirection_url[1] : null,
-                array_key_exists(2, $this->redirection_url) ? $this->redirection_url[2] : null,
-                array_key_exists(3, $this->redirection_url) && is_array($this->redirection_url[3]) ? $this->redirection_url[3] : array()
-           );
-        }
+        return;
     }
 
     /**
@@ -100,55 +88,35 @@ abstract class SDIS62_Oauth_Consumer_Controller_Abstract extends Zend_Controller
      */
     public function callbackAction()
     {
-		// get my session
+        // get my session
 		$session = new Zend_Session_Namespace();
         
-        // if we have not access_token
-        if(!$session->ACCESS_TOKEN)
+        // Test if the request token matches with the request token received in step 1
+        if($this->getParam("oauth_token") == $session->REQUEST_TOKEN->oauth_token)
         {
-            // Test if the request token matches with the request token received in step 1
-            if($this->getParam("oauth_token") == $session->REQUEST_TOKEN->oauth_token)
-            {
-                // Get access token
-                $token = $this->consumer->getAccessToken(
-                    $_GET,
-                    $session->REQUEST_TOKEN
-                );
-                
-                // Serialize and stock access token in session
-                $session->ACCESS_TOKEN = serialize($token);
-     
-                // Now that we have an Access Token, we can discard the Request Token
-                $session->REQUEST_TOKEN = null;
-                
-                // redirection
-                $this->_helper->redirector->gotoSimple(
-                   $this->redirection_url[0],
-                    array_key_exists(1, $this->redirection_url) ? $this->redirection_url[1] : null,
-                    array_key_exists(2, $this->redirection_url) ? $this->redirection_url[2] : null,
-                    array_key_exists(3, $this->redirection_url) && is_array($this->redirection_url[3]) ? $this->redirection_url[3] : array()
-               );
-            }
-            else
-            {
-                // get the instance of auth
-                $auth = Zend_Auth::getInstance();
-        
-                // clear the identity
-                $auth->clearIdentity();
-                
-                // Forget the session lifetime
-                Zend_Session::forgetMe();
-                        
-                $this->_helper->flashMessenger(array(
-                    'context' => 'error',
-                    'title' => 'Hum ...',
-                    'message' => 'Le token ne correspond pas.'
-                ));
-                
-                // redirect to index
-                $this->_helper->redirector("index");
-            }
+            // Get access token
+            $token = $this->consumer->getAccessToken(
+                $_GET,
+                $session->REQUEST_TOKEN
+            );
+            
+            // Serialize and stock access token in session
+            $session->ACCESS_TOKEN = serialize($token);
+
+            // Now that we have an Access Token, we can discard the Request Token
+            $session->REQUEST_TOKEN = null;
+            
+            // redirection
+            $this->_helper->redirector->gotoSimple(
+               $this->redirection_url[0],
+                array_key_exists(1, $this->redirection_url) ? $this->redirection_url[1] : null,
+                array_key_exists(2, $this->redirection_url) ? $this->redirection_url[2] : null,
+                array_key_exists(3, $this->redirection_url) && is_array($this->redirection_url[3]) ? $this->redirection_url[3] : array()
+           );
+        }
+        else
+        {
+            throw new Exception("Bad Token.", 500);
         }
     }
     
@@ -159,9 +127,6 @@ abstract class SDIS62_Oauth_Consumer_Controller_Abstract extends Zend_Controller
 
         // clear the identity
         $auth->clearIdentity();
-        
-        // Forget the session lifetime
-        Zend_Session::forgetMe();
                 
         $this->_helper->flashMessenger(array(
             'context' => 'success',

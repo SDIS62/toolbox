@@ -23,6 +23,7 @@ class SDIS62_Service_Connect
      * Base URI for all API calls
      */
     const API_BASE_URI = 'http://users.local/connect/';
+    
 
     /**
      * @var Zend_Http_Client
@@ -55,9 +56,30 @@ class SDIS62_Service_Connect
      */
     public function __construct(Zend_Oauth_Token_Access $accessToken, array $oauthOptions = array())
     {
-        $oauthOptions['siteUrl'] = self::OAUTH_BASE_URI;
+        $oauthOptions['siteUrl'] = $this->getUrl() . "/oauth";
         $oauthOptions['token'] = $accessToken;
-        $this->setHttpClient($accessToken->getHttpClient($oauthOptions, self::OAUTH_BASE_URI));
+        $this->setHttpClient($accessToken->getHttpClient($oauthOptions, $this->getUrl() . "/oauth"));
+    }
+    
+    /**
+     * Get base URL for request
+     *
+     * @return string
+     */
+    public function getUrl()
+    {
+        if(APPLICATION_ENV === "production")
+        {
+            return "https://apps.sdis62.fr/connect";
+        }
+        else if(APPLICATION_ENV === "development" || APPLICATION_ENV === "testing")
+        {
+            return "http://apps.sdis62.local.connect";
+        }
+        else
+        {
+            return "https://apps.sdis62.fr:4000/connect";
+        }
     }
 
     /**
@@ -93,13 +115,55 @@ class SDIS62_Service_Connect
      *
      * @throws Zend_Http_Client_Exception if HTTP request fails or times out
      * @throws Exception\DomainException if unable to decode JSON payload
-     * @return array
+     * @return object
      */
     public function getAccount()
     {
         $this->init();
-        $response = $this->get('user/show');
-        return Zend_Json::decode( $response->getBody(), Zend_Json::TYPE_ARRAY);
+        $response = $this->get('user/account');
+        return Zend_Json::decode( $response->getBody(), Zend_Json::TYPE_OBJECT);
+    }
+    
+    /**
+     * Get the user's applications
+     *
+     * @throws Zend_Http_Client_Exception if HTTP request fails or times out
+     * @throws Exception\DomainException if unable to decode JSON payload
+     * @return object
+     */
+    public function getApplication()
+    {
+        $this->init();
+        $response = $this->get('user/applications');
+        return Zend_Json::decode( $response->getBody(), Zend_Json::TYPE_OBJECT);
+    }
+    
+    /**
+     * Get the XML Navigation for the user
+     *
+     * @throws Zend_Http_Client_Exception if HTTP request fails or times out
+     * @throws Exception\DomainException if unable to decode JSON payload
+     * @return object
+     */
+    public function account()
+    {
+        $this->init();
+        $response = $this->get('user/navigation');
+        return Zend_Json::decode( $response->getBody(), Zend_Json::TYPE_OBJECT);
+    }
+    
+    /**
+     * Get the user's phone
+     *
+     * @throws Zend_Http_Client_Exception if HTTP request fails or times out
+     * @throws Exception\DomainException if unable to decode JSON payload
+     * @return object
+     */
+    public function account()
+    {
+        $this->init();
+        $response = $this->get('user/phone_device');
+        return Zend_Json::decode( $response->getBody(), Zend_Json::TYPE_OBJECT);
     }
     
    /**
@@ -150,7 +214,7 @@ class SDIS62_Service_Connect
      */
     protected function prepare($path, Zend_Http_Client $client)
     {
-        $client->setUri(self::API_BASE_URI . $path);
+        $client->setUri($this->getUrl() . $path);
 
         /**
          * Do this each time to ensure oauth calls do not inject new params
