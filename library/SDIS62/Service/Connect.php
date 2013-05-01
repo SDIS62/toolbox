@@ -15,17 +15,6 @@
 class SDIS62_Service_Connect
 {
     /**
-     * OAuth Endpoint
-     */
-    const OAUTH_BASE_URI = 'http://users.local/connect/oauth';
-    
-    /**
-     * Base URI for all API calls
-     */
-    const API_BASE_URI = 'http://users.local/connect/';
-    
-
-    /**
      * @var Zend_Http_Client
      */
     protected $httpClient = null;
@@ -120,7 +109,7 @@ class SDIS62_Service_Connect
     public function getAccount()
     {
         $this->init();
-        $response = $this->get('user/account');
+        $response = $this->get('account');
         return Zend_Json::decode( $response->getBody(), Zend_Json::TYPE_OBJECT);
     }
     
@@ -134,7 +123,7 @@ class SDIS62_Service_Connect
     public function getApplications()
     {
         $this->init();
-        $response = $this->get('user/applications');
+        $response = $this->get('applications');
         return Zend_Json::decode( $response->getBody(), Zend_Json::TYPE_OBJECT);
     }
     
@@ -148,7 +137,7 @@ class SDIS62_Service_Connect
     public function getNavigation()
     {
         $this->init();
-        $response = $this->get('user/navigation');
+        $response = $this->get('navigation');
         return Zend_Json::decode( $response->getBody(), Zend_Json::TYPE_OBJECT);
     }
     
@@ -162,7 +151,7 @@ class SDIS62_Service_Connect
     public function getPhoneDevice()
     {
         $this->init();
-        $response = $this->get('user/phone_device');
+        $response = $this->get('phone_device');
         return Zend_Json::decode( $response->getBody(), Zend_Json::TYPE_OBJECT);
     }
     
@@ -214,7 +203,7 @@ class SDIS62_Service_Connect
      */
     protected function prepare($path, Zend_Http_Client $client)
     {
-        $client->setUri($this->getUrl() . $path);
+        $client->setUri($this->getUrl() . "/api?method=" . $path);
 
         /**
          * Do this each time to ensure oauth calls do not inject new params
