@@ -7,7 +7,7 @@ abstract class SDIS62_Model_Entity_Abstract // implements hydrator
 		if($this->primary === null)
 			$this->primary = $primary;
 		else
-			throw new Exception(500, "LA clé primaire existe déjà !");
+			throw new Exception(500, "La clé primaire existe déjà !");
 	}
 	
 	public function getPrimary()

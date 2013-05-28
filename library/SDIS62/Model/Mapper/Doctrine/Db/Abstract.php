@@ -11,7 +11,10 @@ abstract class SDIS62_Model_Mapper_Doctrine_Db_Abstract extends SDIS62_Model_Map
 	public static function find($type, $id)
 	{
 		$class_entity = 'Application_Model_Entity_'.$type;
-		return self::$em->getRepository($class_entity)->find($id);
+		$entity = self::$em->getRepository($class_entity)->find($id);
+		if($entity === null)
+			return new $class_entity;
+		return $entity;
 	}
 	
 	public static function delete($type, $id)

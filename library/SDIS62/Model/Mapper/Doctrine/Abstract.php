@@ -11,26 +11,33 @@ abstract class SDIS62_Model_Mapper_Doctrine_Abstract
 		self::$em = Doctrine\ORM\EntityManager::create($connOpt, $connDoc);
 	}
 	
-	public static function makeEm(SDIS62_Model_DAO_Abstract $dao, $class_entity)
+	public static function makeEm($infos, $class_entity)
 	{
 		$factory = self::$em->getMetadataFactory();
 		$metadata = new Doctrine\ORM\Mapping\ClassMetadata($class_entity);
 		$factory->setMetadataFor($class_entity, $metadata);
 		
-		$metadata = self::$em->getClassMetadata($dao::$infosMap['classe']);
-		$metadata->setTableName($dao::$infosMap['table']);
-		$metadata->setIdentifier($dao::$infosMap['identifier']);
-		foreach($dao::$infosMap['colonnes'] as $col)
+		$metadata = self::$em->getClassMetadata($infos['classe']);
+		$metadata->setTableName($infos['table']);
+		$metadata->setIdentifier($infos['identifier']);
+		foreach($infos['colonnes'] as $col)
 		{
-			if(!isset($dao::$infosMap['mappingType']))
+			if(!isset($infos['mappingType']))
 				$metadata->addInheritedFieldMapping($col);
 			else
 			{
-				$fc = 'map'.$dao::$infosMap['mappingType'];
+				$fc = 'map'.$infos['mappingType'];
 				$metadata->$fc($col);
 			}
 			$metadata->reflFields[$col['fieldName']] = new ReflectionProperty(new $class_entity, $col['fieldName']);
 		}
 		$metadata->setIdGenerator(new Doctrine\ORM\Id\AssignedGenerator);
 	}
+	/*
+	public static function afficheDatabase()
+	{
+		print_r(self::$em->createQuery("SELECT p.primary, p.nom, p.prenom FROM Application_Model_Entity_Personne p")->getResult());
+		print_r(self::$em->createQuery("SELECT o.primary, o.label, o.idPersonne FROM Application_Model_Entity_Objet o")->getResult());
+	}
+	*/
 }
