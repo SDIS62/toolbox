@@ -16,7 +16,6 @@ abstract class SDIS62_Model_DAO_Abstract
 		}
 		if(self::$mapper === null)
 			self::$mapper = 'SDIS62_Model_Mapper_'.self::$type_orm.'_'.self::$type_db.'_Abstract';
-		// $this->resetTable();
 	}
 	
 	public static function getInstance($type)
