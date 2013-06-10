@@ -6,7 +6,7 @@
 * @package SDIS62_Model_Entity_Interface
 */
 
- /**
+/**
 * Interface for entity instances.
 *
 * @category SDIS62
@@ -18,6 +18,7 @@ interface SDIS62_Model_Entity_Interface
 	* Set the primary key for the current object
 	*
 	* @param int $primary
+	* @return Object Provides fluent interface
 	*/ 
 	public function setPrimary($primary);
 

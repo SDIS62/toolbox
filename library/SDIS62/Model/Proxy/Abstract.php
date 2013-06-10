@@ -40,20 +40,24 @@ abstract class SDIS62_Model_Proxy_Abstract implements SDIS62_Model_Entity_Interf
 	* Set the entity object for the current proxy
 	*
 	* @params SDIS62_Model_Entity_Abstract $entity
+	* @return SDIS62_Model_Proxy_Abstract Provides fluent interface
 	*/
 	public function setEntity(SDIS62_Model_Entity_Abstract $entity)
 	{
 		$this->entity = $entity;
+		return $this;
 	}
 	
 	/**
 	* Set the primary key for the current proxy
 	*
 	* @param int $primary
+	* @return SDIS62_Model_Proxy_Abstract Provides fluent interface
 	*/ 
 	public function setPrimary($primary)
 	{	
 		$this->getEntity()->setPrimary($primary);
+		return $this;
 	}
 	
 	/**

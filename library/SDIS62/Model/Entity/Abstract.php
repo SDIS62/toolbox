@@ -18,6 +18,7 @@ abstract class SDIS62_Model_Entity_Abstract implements SDIS62_Model_Entity_Inter
 	* Set the primary key for the current entity
 	*
 	* @param int $primary
+	* @return SDIS62_Model_Entity_Abstract Provides fluent interface
 	*/ 
 	public function setPrimary($primary)
 	{
@@ -29,6 +30,7 @@ abstract class SDIS62_Model_Entity_Abstract implements SDIS62_Model_Entity_Inter
 		{
 			throw new Exception(500, "La clé primaire de l'entité existe déjà !");
 		}
+		return $this;
 	}
 	
 	/**
@@ -42,10 +44,20 @@ abstract class SDIS62_Model_Entity_Abstract implements SDIS62_Model_Entity_Inter
 	}
 	
 	/**
+     * Privide __toString magic method
+     *
+     * @return string
+     */     
+    public function __toString()
+    {
+        return serialize($this);
+    }
+	
+	/**
 	* Hydrate an array who contain informations to add at entity
 	*
 	* @params Array $array
-	* @return SDIS62_Model_Entity_Abstract
+	* @return SDIS62_Model_Entity_Abstract Provides fluent interface
 	*/
 	public abstract function hydrate($array);
 	
