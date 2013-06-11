@@ -58,7 +58,6 @@ abstract class SDIS62_Model_DAO_Abstract
 		{
 			self::$mapper = 'SDIS62_Model_Mapper_'.self::$type_orm.'_'.self::$type_db.'_Abstract';
 		}
-		$this->resetTable();
 	}
 	
 	/**

@@ -66,10 +66,4 @@ abstract class SDIS62_Model_Mapper_Doctrine_Abstract
 		}
 		$metadata->setIdGenerator(new Doctrine\ORM\Id\AssignedGenerator);
 	}
-
-	public static function afficheDatabase()
-	{
-		print_r(self::$em->createQuery("SELECT p.primary, p.nom, p.prenom FROM Application_Model_Entity_Personne p")->getResult());
-		print_r(self::$em->createQuery("SELECT o.primary, o.label, o.idPersonne FROM Application_Model_Entity_Objet o")->getResult());
-	}
 }
