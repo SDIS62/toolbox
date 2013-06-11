@@ -19,7 +19,7 @@ abstract class SDIS62_Model_DAO_Abstract
 	*
 	* @var Object
 	*/
-	protected static $mapper = null;
+	private static $mapper = null;
 	
 	/**
 	* Type of database
@@ -40,7 +40,7 @@ abstract class SDIS62_Model_DAO_Abstract
 	*
 	* @var SDIS62_Model_DAO_Abstract
 	*/
-	protected static $dao = array();
+	private static $dao = array();
 	
 	/**
 	* Constructor of class to make a DAO with a specified type of entity
@@ -74,5 +74,15 @@ abstract class SDIS62_Model_DAO_Abstract
 			self::$dao[$type] = new $class_dao($type);
 		}
 		return self::$dao[$type];
+	}
+	
+	/**
+	* Get the Mapper's class name
+	*
+	* @return string
+	*/
+	protected function getMapper()
+	{
+		return self::$mapper;
 	}
 }
