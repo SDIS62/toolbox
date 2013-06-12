@@ -15,6 +15,13 @@
 abstract class SDIS62_Model_Entity_Abstract implements SDIS62_Model_Entity_Interface
 {
 	/**
+	* Primary key
+	*
+	* @var int
+	*/
+	public $primary;
+	
+	/**
 	* Set the primary key for the current entity
 	*
 	* @param int $primary
