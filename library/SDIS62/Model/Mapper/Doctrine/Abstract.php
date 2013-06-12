@@ -24,15 +24,13 @@ abstract class SDIS62_Model_Mapper_Doctrine_Abstract
 	/**
 	* Initialise the entity manager
 	*
-	* @params string $type_db
-	* @params string $type_orm
 	* @params Array $connOpt
 	* @params Doctrine\ORM\Configuration $connDoc
 	*/
-	public static function createEntityManager($type_db, $type_orm, $connOpt, $connDoc)
+	public static function createEntityManager($connOpt, $connDoc)
 	{
-		SDIS62_Model_DAO_Abstract::$type_db = $type_db;
-		SDIS62_Model_DAO_Abstract::$type_orm = $type_orm;
+		SDIS62_Model_DAO_Abstract::$type_db = $connOpt['type_db'];
+		SDIS62_Model_DAO_Abstract::$type_orm = $connOpt['type_orm'];
 		self::$em = Doctrine\ORM\EntityManager::create($connOpt, $connDoc);
 	}
 	

@@ -15,9 +15,9 @@
 abstract class SDIS62_Model_DAO_Abstract
 {
 	/**
-	* Mapper object
+	* class name of mapper
 	*
-	* @var Object
+	* @var string
 	*/
 	private static $mapper = null;
 	
@@ -36,9 +36,9 @@ abstract class SDIS62_Model_DAO_Abstract
 	public static $type_orm = null;
 	
 	/**
-	* DAO object
+	* DAO objects
 	*
-	* @var SDIS62_Model_DAO_Abstract
+	* @var SDIS62_Model_DAO_Abstract[]
 	*/
 	private static $dao = array();
 	
