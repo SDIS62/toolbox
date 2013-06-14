@@ -42,4 +42,22 @@ interface SDIS62_Model_DAO_Interface
 	* @params SDIS62_Model_Proxy_Abstract $proxy
 	*/
 	public function create(SDIS62_Model_Proxy_Abstract $proxy);
+	
+	/**
+	* Ask the mapper to find a specified entity from database due to a foreign key
+	*
+	* @params string $type
+	* @params int $id
+	* @return SDIS62_Model_Proxy_Abstract
+	*/
+	public function findByCriteria($type, $id);
+	
+	/**
+	* Ask the mapper to find several entities from database due to a foreign key
+	*
+	* @params string $type
+	* @params int $id
+	* @return SDIS62_Model_Proxy_Abstract[]
+	*/
+	public function findAllByCriteria($type, $id);
 }

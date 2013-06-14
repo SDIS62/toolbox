@@ -30,7 +30,7 @@ abstract class SDIS62_Model_Proxy_Abstract implements SDIS62_Model_Entity_Interf
 	{
 		if($this->entity === null)
 		{
-			$class = 'Application_Model_Entity_'.$this->type_objet;
+			$class = 'Application_Model_Entity_'.$this::$type_objet;
 			$this->entity = new $class;
 		}
 		return $this->entity;

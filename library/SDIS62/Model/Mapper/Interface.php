@@ -55,4 +55,24 @@ interface SDIS62_Model_Mapper_Interface
 	* @params int $id
 	*/
 	public static function delete($type, $id);
+	
+	/**
+	* Find in database an entity with a specified foreign key and extract it
+	*
+	* @params string $type
+	* @params Array $array
+	* @params Array $alias
+	* @return Array
+	*/
+	public static function findByCriteria($type, $array, $alias);
+	
+	/**
+	* Find in database several entities with a specified foreign key and extract them
+	*
+	* @params string $type
+	* @params Array $array
+	* @params Array $alias
+	* @return Array
+	*/
+	public static function findAllByCriteria($type, $array, $alias);
 }
