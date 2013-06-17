@@ -15,46 +15,52 @@
 interface SDIS62_Model_Mapper_Interface
 {
 	/**
-	* Insert informations in database
+	* Insert informations in database and get the primary key
 	*
 	* @params string $type
 	* @params Array $array
+	* @params Array $infos
+	* @return int
 	*/
-	public static function insert($type, $array);
+	public static function insert($type, $array, $infos);
 	
 	/**
 	* Update informations in database
 	*
 	* @params string $type
 	* @params Array $array
+	* @params Array $infos
 	*/
-	public static function update($type, $array);
-	
-	/**
-	* Show if there are an entity with a specified primary key in database
-	*
-	* @params string $type
-	* @params int $id
-	* @return bool
-	*/
-	public static function exist($type, $id);
+	public static function update($type, $array, $infos);
 	
 	/**
 	* Find in database an entity with a specified primary key and extract it
 	*
 	* @params string $type
 	* @params int $id
+	* @params Array $infos
 	* @return Array
 	*/
-	public static function find($type, $id);
+	public static function find($type, $id, $infos);
+	
+	/**
+	* Show if there are an entity with a specified primary key in database
+	*
+	* @params string $type
+	* @params int $id
+	* @params Array $infos
+	* @return bool
+	*/
+	public static function exist($type, $id, $infos);
 	
 	/**
 	* Delete informations from database with a specified primary key
 	*
 	* @params string $type
 	* @params int $id
+	* @params Array $infos
 	*/
-	public static function delete($type, $id);
+	public static function delete($type, $id, $infos);
 	
 	/**
 	* Find in database an entity with a specified foreign key and extract it
@@ -62,9 +68,10 @@ interface SDIS62_Model_Mapper_Interface
 	* @params string $type
 	* @params Array $array
 	* @params Array $alias
+	* @params Array $infos
 	* @return Array
 	*/
-	public static function findByCriteria($type, $array, $alias);
+	public static function findByCriteria($type, $array, $alias, $infos);
 	
 	/**
 	* Find in database several entities with a specified foreign key and extract them
@@ -72,7 +79,8 @@ interface SDIS62_Model_Mapper_Interface
 	* @params string $type
 	* @params Array $array
 	* @params Array $alias
+	* @params Array $infos
 	* @return Array
 	*/
-	public static function findAllByCriteria($type, $array, $alias);
+	public static function findAllByCriteria($type, $array, $alias, $infos);
 }
