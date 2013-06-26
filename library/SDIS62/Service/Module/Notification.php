@@ -43,8 +43,6 @@ class SDIS62_Service_Module_Notification extends Zend_Service_Abstract
         
         // Setup the REST client
         $this->rest_client = new Zend_Rest_Client($url);
-        
-        return parent::__construct();
     }
 
     /**
@@ -55,11 +53,11 @@ class SDIS62_Service_Module_Notification extends Zend_Service_Abstract
      * @param  $ville
      * @return object
      */
-    public function send()
+    public function send(array $recipientsid, $subject, $message, array $types = array("mail"))
     {
         // Set the request
 		$response = Zend_Json::decode(
-            $this->rest_client->send()->get(),
+            $this->rest_client->send($recipientsid, $subject, $message, $types)->get(),
             Zend_Json::TYPE_OBJECT
         );
 		

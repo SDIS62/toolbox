@@ -43,8 +43,6 @@ class SDIS62_Service_Module_Notification extends Zend_Service_Abstract
         
         // Setup the REST client
         $this->rest_client = new Zend_Rest_Client($url);
-        
-        return parent::__construct();
     }
 
     /**
