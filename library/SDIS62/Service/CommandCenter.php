@@ -101,6 +101,27 @@ class SDIS62_Service_CommandCenter extends Zend_Service_Abstract
     }
     
     /**
+     * Get user's application (ACL)
+     *
+     * @param  $id_user
+     * @return object
+     */
+    public function getUserApplications($id_user)
+    {
+        // Set the URL
+        $rest_user = new Zend_Rest_Client($this->getUrl() . '/user');
+        
+        // Set the request
+		$response = Zend_Json::decode(
+            $rest_user->getApplications($id_application)->get(), 
+            Zend_Json::TYPE_OBJECT
+        );
+		
+        // return the results
+		return $response;
+    }
+    
+    /**
      * Get the application
      *
      * @param  $id_application
@@ -120,7 +141,7 @@ class SDIS62_Service_CommandCenter extends Zend_Service_Abstract
         // return the results
 		return $response;
     }
-    
+
     /**
      * Get the application by the consumer_key
      *
