@@ -71,7 +71,7 @@ interface SDIS62_Model_Mapper_Interface
 	* @params Array $infos
 	* @return Array
 	*/
-	public static function findByCriteria($type, $array, $alias, $infos);
+	public static function findByCriteria($type, $condition, $infos);
 	
 	/**
 	* Find in database several entities with a specified foreign key and extract them
@@ -82,5 +82,5 @@ interface SDIS62_Model_Mapper_Interface
 	* @params Array $infos
 	* @return Array
 	*/
-	public static function findAllByCriteria($type, $array, $alias, $infos);
+	public static function findAllByCriteria($type, $condition, $infos);
 }
