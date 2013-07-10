@@ -15,7 +15,7 @@
 abstract class SDIS62_Model_Mapper_Doctrine_Db_Abstract extends SDIS62_Model_Mapper_Doctrine_Abstract implements SDIS62_Model_Mapper_Interface
 {
 	/**
-	* Insert informations in database and get the primary key (2)
+	* Insert informations in database and get the primary key
 	*
 	* @params string $type
 	* @params Array $array
