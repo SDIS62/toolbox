@@ -40,7 +40,7 @@ abstract class SDIS62_Model_Mapper_Doctrine_Abstract
 	* @params Array $infos
 	* @params string $class_entity
 	*/
-	public static function makeEm($infos, $class_entity)
+	public static function makeEm($infos, $class_entity) // Par la suite, essayer de passer par Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder
 	{
 		$factory = self::$em->getMetadataFactory();
 		$metadata = new Doctrine\ORM\Mapping\ClassMetadata($class_entity);
@@ -51,17 +51,22 @@ abstract class SDIS62_Model_Mapper_Doctrine_Abstract
 		$metadata->setIdentifier($infos['identifier']);
 		foreach($infos['colonnes'] as $col)
 		{
-			if(!isset($infos['mappingType']))
-			{
-				$metadata->addInheritedFieldMapping($col);
-			}
-			else
-			{
-				$fc = 'map'.$infos['mappingType'];
-				$metadata->$fc($col);
-			}
+			$metadata->addInheritedFieldMapping($col);
 			$metadata->reflFields[$col['fieldName']] = new ReflectionProperty(new $class_entity, $col['fieldName']);
 		}
-		$metadata->setIdGenerator(new Doctrine\ORM\Id\AssignedGenerator);
+		if($infos['id_auto'])
+		{
+			$metadata->setIdGeneratorType(Doctrine\ORM\Mapping\ClassMetadataInfo::GENERATOR_TYPE_IDENTITY);
+			$metadata->setIdGenerator(new Doctrine\ORM\Id\IdentityGenerator);
+		}
+		else
+		{
+			$metadata->setIdGeneratorType(Doctrine\ORM\Mapping\ClassMetadataInfo::GENERATOR_TYPE_NONE);
+			$metadata->setIdGenerator(new Doctrine\ORM\Id\AssignedGenerator);
+		}
+		if(isset($infos['join']))
+		{
+			$metadata->addInheritedAssociationMapping($infos['join']);
+		}
 	}
 }
