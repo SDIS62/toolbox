@@ -51,7 +51,15 @@ abstract class SDIS62_Model_Mapper_Doctrine_Abstract
 		$metadata->setIdentifier($infos['identifier']);
 		foreach($infos['colonnes'] as $col)
 		{
-			$metadata->addInheritedFieldMapping($col);
+			if(!isset($infos['mappingType']))
+			{
+				$metadata->addInheritedFieldMapping($col);
+			}
+			else
+			{
+				$fc = 'map'.$infos['mappingType'];
+				$metadata->$fc($col);
+			}
 			$metadata->reflFields[$col['fieldName']] = new ReflectionProperty(new $class_entity, $col['fieldName']);
 		}
 		if($infos['id_auto'])
