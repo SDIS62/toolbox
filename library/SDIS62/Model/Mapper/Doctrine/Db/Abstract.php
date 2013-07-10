@@ -24,43 +24,20 @@ abstract class SDIS62_Model_Mapper_Doctrine_Db_Abstract extends SDIS62_Model_Map
 	*/
 	public static function insert($type, $array, $infos)
 	{
-		$primary_rows = $infos['identifier'];
 		$class = 'Application_Model_Entity_'.$type;
 		$entity = new $class;
-		$entity->hydrate($array);
-		if($entity->getPrimary() === null)
+		
+		/*
+		foreach($array as $n => $v)
 		{
-			$query = "SELECT e.".$primary_rows[0]." FROM ".$class." e";
-			$i = 0;
-			foreach($infos['colonnes'] as $a)
+			if(is_array($v))
 			{
-				if(isset($array[$a['fieldName']]) && $array[$a['fieldName']] != null)
-				{
-					if($i == 0)
-					{
-						$query = $query." WHERE e.".$a['columnName']." = '".$array[$a['fieldName']]."'";
-					}
-					else
-					{
-						$query = $query." AND e.".$a['columnName']." = '".$array[$a['fieldName']]."'";
-					}
-					$i++;
-				}
-			}
-			$res = self::$em->createQuery($query)->getResult();
-			echo ">>".count($res);
-			if(count($res) != 1)
-			{
-				return null;
-			}
-			$entity->hydrate($res[0]);
-			if($res[0] !== null)
-			{
-				echo ">>".$entity->getPrimary();
-				self::update($type, $array, $infos);
-				return $entity->getPrimary();
+				$array[$n] = new \Doctrine\Common\Collections\ArrayCollection($v);
 			}
 		}
+		*/
+		
+		$entity->hydrate($array);
 		self::$em->persist($entity);
 		self::$em->flush();
 		return $entity->getPrimary();
@@ -72,52 +49,36 @@ abstract class SDIS62_Model_Mapper_Doctrine_Db_Abstract extends SDIS62_Model_Map
 	* @params string $type
 	* @params Array $array
 	* @params Array $infos
+	* @return int
 	*/
 	public static function update($type, $array, $infos)
 	{
 		$primary_rows = $infos['identifier'];
 		$class = 'Application_Model_Entity_'.$type;
 		$entity = new $class;
+		
+		/*
+		for($i=0; $i<count($array); $i++)
+		{
+			if(is_array($array[$i]))
+			{
+				$array[$i] = new \Doctrine\Common\Collections\ArrayCollection($array[$i]);
+			}
+		}
+		*/
+		
 		$entity->hydrate($array);
-		if($entity->getPrimary() === null)
+		$update = self::$em->createQueryBuilder()->update($class, "e");
+		foreach($infos['colonnes'] as $a)
 		{
-			$query = "SELECT e.".$primary_rows[0]." FROM ".$class." e";
-			$i = 0;
-			foreach($infos['colonnes'] as $a)
+			if(isset($array[$a['fieldName']]) && $array[$a['fieldName']] != null)
 			{
-				if(isset($array[$a['fieldName']]) && $array[$a['fieldName']] != null)
-				{
-					if($i == 0)
-					{
-						$query = $query." WHERE e.".$a['columnName']." = '".$array[$a['fieldName']]."'";
-					}
-					else
-					{
-						$query = $query." AND e.".$a['columnName']." = '".$array[$a['fieldName']]."'";
-					}
-					$i++;
-				}
+				$update = $update->set('e.'.$a['fieldName'], "'".$array[$a['fieldName']]."'");
 			}
-			$res = self::$em->createQuery($query)->getResult();
-			if(count($res) != 1)
-			{
-				return;
-			}
-			$entity->hydrate($res[0]);
 		}
-		if($entity->getPrimary() !== null)
-		{
-			$update = self::$em->createQueryBuilder()->update($class, "e");
-			foreach($infos['colonnes'] as $a)
-			{
-				if(isset($array[$a['fieldName']]) && $array[$a['fieldName']] != null)
-				{
-					$update = $update->set('e.'.$a['columnName'], "'".$array[$a['fieldName']]."'");
-				}
-			}
-			$update = $update->where('e.'.$primary_rows[0].' = '.$entity->getPrimary())->getQuery();
-			$update->execute();
-		}
+		$update = $update->where('e.'.$primary_rows[0].' = '.$entity->getPrimary())->getQuery();
+		$update->execute();
+		return $entity->getPrimary();
 	}
 	
 	/**
@@ -136,12 +97,23 @@ abstract class SDIS62_Model_Mapper_Doctrine_Db_Abstract extends SDIS62_Model_Map
 		}
 		$primary_rows = $infos['identifier'];
 		$class = 'Application_Model_Entity_'.$type;
-		$query = "SELECT e FROM ".$class." e WHERE e.".$primary_rows[0]." = ".$id;
-		$array = self::$em->createQuery($query)->getResult();
-		if(empty($array[0]))
+		$array = self::$em->getRepository($class)->find($id);
+		if(empty($array))
 		{
 			return array($primary_rows[0] => $id);
 		}
+		
+		/*
+		$array = $array[0];
+		for($i=0; $i<count($array[0]); $i++)
+		{
+			if($array[$i] instanceof \Doctrine\Common\Collections\ArrayCollection)
+			{
+				$array[$i] = $array[$i]->toArray();
+			}
+		}
+		*/
+		
 		return $array[0]->extract();
 	}
 	
@@ -176,11 +148,10 @@ abstract class SDIS62_Model_Mapper_Doctrine_Db_Abstract extends SDIS62_Model_Map
 		{
 			return;
 		}
-		$primary_rows = $infos['identifier'];
 		$class = 'Application_Model_Entity_'.$type;
-		$query = "DELETE FROM ".$class." e WHERE e.".$primary_rows[0]." = ".$id;
-		echo $query;
-		self::$em->createQuery($query)->execute();
+		$entity = self::$em->getRepository($class)->find($id);
+		self::$em->remove($entity);
+		self::$em->flush();
 	}
 	
 	/**
@@ -192,35 +163,16 @@ abstract class SDIS62_Model_Mapper_Doctrine_Db_Abstract extends SDIS62_Model_Map
 	* @params Array $infos
 	* @return Array
 	*/
-	public static function findByCriteria($type, $array, $alias, $infos)
+	public static function findByCriteria($type, $condition, $infos)
 	{
 		$primary_rows = $infos['identifier'];
 		$class = 'Application_Model_Entity_'.$type;
-		$query = "SELECT ".$alias[$type]." FROM ".$class." ".$alias[$type]." ";
-		if(isset($array['JOIN']))
-		{
-			foreach($array['JOIN'] as $a)
-			{
-				$tables = $a['tables'];
-				$colonnes = $a['colonnes'];
-				$query = $query."JOIN ".$tables[1]." ".$alias[$tables[1]].
-				" ON ".$alias[$tables[0]].".".$colonnes[0]." = ".$alias[$tables[1]].".".$colonnes[1]." ";
-			}
-			foreach($array['WHERE'] as $a)
-			{
-				if($a['valeur'] === null)
-				{
-					return array();
-				}
-				$query = $query."WHERE ".$alias[$a['table']].".".$a['colonne']." = ".$a['valeur'];
-			}
-		}
-		$res = self::$em->createQuery($query)->getResult();
-		if(empty($res[0]))
+		$array = self::$em->getRepository($class)->findBy($condition);
+		if(empty($array))
 		{
 			return array($primary_rows[0] => $id);
 		}
-		return $res[0]->extract();
+		return $array[0]->extract();
 	}
 	
 	/**
@@ -232,40 +184,19 @@ abstract class SDIS62_Model_Mapper_Doctrine_Db_Abstract extends SDIS62_Model_Map
 	* @params Array $infos
 	* @return Array
 	*/
-	public static function findAllByCriteria($type, $array, $alias, $infos)
+	public static function findAllByCriteria($type, $condition, $infos)
 	{
-		$primary_rows = $infos['identifier'];
 		$class = 'Application_Model_Entity_'.$type;
-		$query = "SELECT ".$alias[$type]." FROM ".$class." ".$alias[$type]." ";
-		if(isset($array['JOIN']))
+		$array = self::$em->getRepository($class)->findBy($condition);
+		if(empty($array))
 		{
-			foreach($array['JOIN'] as $a)
-			{
-				$tables = $a['tables'];
-				$colonnes = $a['colonnes'];
-				$query = $query."JOIN ".$tables[1]." ".$alias[$tables[1]].
-				" ON ".$alias[$tables[0]].".".$colonnes[0]." = ".$alias[$tables[1]].".".$colonnes[1]." ";
-			}
-			foreach($array['WHERE'] as $a)
-			{
-				if($a['valeur'] === null)
-				{
-					return array();
-				}
-				$query = $query."WHERE ".$alias[$a['table']].".".$a['colonne']." = ".$a['valeur'];
-			}
+			return array(array());
 		}
-		$res = self::$em->createQuery($query)->getResult();
-		if(empty($res[0]))
+		$taille = $count($array);
+		for($i=0; $i<count($array); $i++)
 		{
-			return array(array($primary_rows[0] => $id));
+			$array[$i] = $array[$i]->extract();
 		}
-		$i = 0;
-		foreach($res as $r)
-		{
-			$res[$i] = $r->extract();
-			$i++;
-		}
-		return $res;
+		return $array;
 	}
 }
