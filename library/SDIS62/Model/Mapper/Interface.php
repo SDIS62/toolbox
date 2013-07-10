@@ -66,8 +66,7 @@ interface SDIS62_Model_Mapper_Interface
 	* Find in database an entity with a specified foreign key and extract it
 	*
 	* @params string $type
-	* @params Array $array
-	* @params Array $alias
+	* @params Array $condition
 	* @params Array $infos
 	* @return Array
 	*/
@@ -77,8 +76,7 @@ interface SDIS62_Model_Mapper_Interface
 	* Find in database several entities with a specified foreign key and extract them
 	*
 	* @params string $type
-	* @params Array $array
-	* @params Array $alias
+	* @params Array $condition
 	* @params Array $infos
 	* @return Array
 	*/
