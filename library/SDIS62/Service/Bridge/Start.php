@@ -34,7 +34,7 @@ class SDIS62_Service_Bridge_Start extends Zend_Service_Abstract
         }
         else if(APPLICATION_ENV === "development" || APPLICATION_ENV === "testing")
         {
-            $url= "http://apps.sdis62.local.bridges/start/api";
+            $url= "http://apps.sdis62.local/bridges/start/api";
         }
         else
         {

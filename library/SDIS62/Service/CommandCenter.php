@@ -27,7 +27,7 @@ class SDIS62_Service_CommandCenter extends Zend_Service_Abstract
         }
         else if(APPLICATION_ENV === "development" || APPLICATION_ENV === "testing")
         {
-            return "http://apps.sdis62.local.admin/api";
+            return "http://apps.sdis62.local/admin/api";
         }
         else
         {

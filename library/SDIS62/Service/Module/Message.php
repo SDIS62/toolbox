@@ -34,7 +34,7 @@ class SDIS62_Service_Module_Notification extends Zend_Service_Abstract
         }
         else if(APPLICATION_ENV === "development" || APPLICATION_ENV === "testing")
         {
-            $url= "http://apps.sdis62.local.modules.notification/api";
+            $url= "http://apps.sdis62.local/modules/notification/api";
         }
         else
         {

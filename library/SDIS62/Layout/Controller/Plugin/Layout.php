@@ -11,6 +11,7 @@ class SDIS62_Layout_Controller_Plugin_Layout extends Zend_Layout_Controller_Plug
 
         $layout = $this->getLayout();
 
+        // Récupération du bon layout en fonction du module
         if(null !== file_exists($this->getModulePath() . 'layouts' . DIRECTORY_SEPARATOR . 'scripts'))
         {
             $layout->setLayoutPath($this->getModulePath() . DIRECTORY_SEPARATOR . 'layouts' . DIRECTORY_SEPARATOR . 'scripts');

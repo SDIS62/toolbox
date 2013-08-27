@@ -3,16 +3,16 @@
  * SDIS 62
  *
  * @category   SDIS62
- * @package    SDIS62_Service_Connect
+ * @package    SDIS62_Service_Module_Connect
  */
 
  /**
  * Service Application
  *
  * @category   SDIS62
- * @package    SDIS62_Service_Connect
+ * @package    SDIS62_Service_Module_Connect
  */
-class SDIS62_Service_Connect
+class SDIS62_Service_Module_Connect
 {
     /**
      * @var Zend_Http_Client
@@ -56,7 +56,7 @@ class SDIS62_Service_Connect
         }
         else if(APPLICATION_ENV === "development" || APPLICATION_ENV === "testing")
         {
-            return "http://apps.sdis62.local.connect";
+            return "http://apps.sdis62.local/module/connect";
         }
         else
         {
@@ -153,17 +153,5 @@ class SDIS62_Service_Connect
     public function getNavigation()
     {
 		return Zend_Json::decode($this->getRestClient()->navigation()->get(), Zend_Json::TYPE_ARRAY);
-    }
-    
-    /**
-     * Get the user's phone
-     *
-     * @throws Zend_Http_Client_Exception if HTTP request fails or times out
-     * @throws Exception\DomainException if unable to decode JSON payload
-     * @return object
-     */
-    public function getPhoneDevice()
-    {
-		return Zend_Json::decode($this->getRestClient()->phone_device()->get(), Zend_Json::TYPE_OBJECT);
     }
 }
