@@ -63,6 +63,8 @@ abstract class SDIS62_Model_Mapper_Abstract
             $row->setFromArray($data);
             $entity->setId($row->save());
         }
+        
+        return $entity->getId();
     }
     
     public function delete($id)
