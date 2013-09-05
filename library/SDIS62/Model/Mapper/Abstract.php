@@ -55,13 +55,13 @@ abstract class SDIS62_Model_Mapper_Abstract
 
         if($entity->getId() === null)
         {
-            return $this->getDbTable()->insert($data);
+            $entity->setId($this->getDbTable()->insert($data));
         }
         else
         {
             $row = $this->getDbTable()->find($entity->getId())->current();
             $row->setFromArray($data);
-            return $row->save();
+            $entity->setId($row->save());
         }
     }
     
