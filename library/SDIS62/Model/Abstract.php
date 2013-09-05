@@ -18,18 +18,31 @@ abstract class SDIS62_Model_Abstract implements SDIS62_Model_Interface_Abstract
     public function extract()
     {
         $vars = get_object_vars($this);
-        
-        foreach($vars as $key => $var)
+        $this->_extract($vars);
+        $vars["classname"] = get_class($this);
+        return $vars;
+    }
+    
+    public function _extract(&$array)
+    {
+        foreach($array as $key => &$var)
         {
             if(is_object($var))
             {
-                $key = $var->extract();
+                if($var instanceof SDIS62_Model_Proxy_Abstract)
+                {
+                    $var = $var->getEntity()->extract();
+                }
+                else
+                {
+                    $var = $var->extract();
+                }
+            }
+            elseif(is_array($var))
+            {   
+                $this->_extract($var);
             }
         }
-        
-        $vars["classname"] = get_class($this);
-        
-        return $vars;
     }
     
     public function hydrate(array $data)

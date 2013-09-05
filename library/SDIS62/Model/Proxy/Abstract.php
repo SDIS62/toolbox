@@ -32,7 +32,7 @@ abstract class SDIS62_Model_Proxy_Abstract implements SDIS62_Model_Interface_Abs
         $this->getEntity()->hydrate($data);
     }
 
-	protected function getEntity()
+	public function getEntity()
 	{
 		if($this->entity === null)
 		{
@@ -76,14 +76,6 @@ abstract class SDIS62_Model_Proxy_Abstract implements SDIS62_Model_Interface_Abs
         
         // On lance l'extract de l'entité
         $data = $this->getEntity()->extract();
-        
-        // On change les proxys en Models
-        array_walk_recursive($data, function(&$item, $key) {
-            if($key === "classname")
-            {
-                $item = str_replace("Application_Model_Proxy_", "Application_Model_", $item);
-            }
-        });
         
         // On annule l'alias de la valeur null
         array_walk($data, function(&$var) {
