@@ -70,7 +70,7 @@ abstract class SDIS62_Model_Mapper_Abstract
     public function delete($id)
     {
         $entity = $this->getDbTable()->find($id)->current();
-        $entity->delete();
+        return $entity->delete();
     }
     
     public function fetchAll($where = null, $order = null, $count = null, $offset = null)
