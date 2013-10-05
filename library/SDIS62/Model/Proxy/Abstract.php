@@ -138,9 +138,6 @@ abstract class SDIS62_Model_Proxy_Abstract implements SDIS62_Model_Interface_Abs
      */
     public function extractWithoutForceFullLoad()
     {
-        // On charge complètement l'objet
-        $this->forceFullLoad();
-        
         // On lance l'extract de l'entité
         $data = $this->getEntity()->extract();
         
