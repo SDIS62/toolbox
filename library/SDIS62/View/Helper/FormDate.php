@@ -1,7 +1,5 @@
 <?php
 
-require_once 'Zend/View/Helper/FormElement.php';
-
 class SDIS62_View_Helper_FormDate extends Zend_View_Helper_FormElement
 {
     public function formDate($name, $value = null, $attribs = null)

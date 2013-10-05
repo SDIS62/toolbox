@@ -1,18 +1,6 @@
 <?php
-/**
- * SDIS 62
- *
- * @category   SDIS62
- * @package    SDIS62_Oauth
- */
- 
- /**
- * Class for Oauth Consumer Action Controller instance.
- *
- * @category   SDIS62
- * @package    SDIS62_Oauth
- */
-abstract class SDIS62_Oauth_Consumer_Controller_Abstract extends Zend_Controller_Action
+
+class SDIS62_Controller_Action_OauthConsumer extends Zend_Controller_Action
 {
     /**
      * Default Zend_Oauth_Consumer object.
@@ -127,23 +115,5 @@ abstract class SDIS62_Oauth_Consumer_Controller_Abstract extends Zend_Controller
         {
             throw new Exception("Bad Token.", 500);
         }
-    }
-
-
-    /**
-     * Dispatch to logout the user and discard access token
-     *
-     * @return void
-     */      
-    public function logoutAction()
-    {
-        // get the instance of auth
-        $auth = Zend_Auth::getInstance();
-
-        // clear the identity
-        $auth->clearIdentity();
-
-        // redirect to index
-        $this->_helper->redirector("index", "index");
     }
 }

@@ -1,7 +1,5 @@
 <?php
 
-require_once 'Zend/View/Helper/FormElement.php';
-
 class SDIS62_View_Helper_FormTime extends Zend_View_Helper_FormElement
 {
     public function formTime($name, $value = null, $attribs = null)

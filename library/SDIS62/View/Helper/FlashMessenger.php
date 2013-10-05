@@ -1,29 +1,17 @@
 <?php
-/**
- * SDIS 62
- *
- * @category   SDIS62
- * @package    SDIS62_View_Helper
- */
- 
- /**
- * Class for Flash Messenger View Helper.
- *
- * @category   SDIS62
- * @package    SDIS62_View_Helper
- */
+
 class SDIS62_View_Helper_FlashMessenger extends Zend_View_Helper_Abstract  implements Countable
 {
 
     /**
-     * Default Zend_Controller_Action_Helper_FlashMessenger object.
+     * Instance de Zend_Controller_Action_Helper_FlashMessenger
      *
      * @var Zend_Controller_Action_Helper_FlashMessenger
      */
     protected $flashMessenger;
 
     /**
-     * Construct and get the flash messenger action helper
+     * Constructeur
      *
      * @return void
      */
@@ -33,7 +21,7 @@ class SDIS62_View_Helper_FlashMessenger extends Zend_View_Helper_Abstract  imple
     }
 
     /**
-     * Function wich provide fluent interface
+     * Interface fluide
      *
      * @return SDIS62_View_Helper_FlashMessenger
      */
@@ -43,10 +31,10 @@ class SDIS62_View_Helper_FlashMessenger extends Zend_View_Helper_Abstract  imple
     }
 
     /**
-     * Output the messages.
+     * Genère de l'html
      *
-     * @param string $my_key (Optional) The key wich represents the messages to retrieve.
-     * @param string $template (Optional) The template wich represents a message in the output list
+     * @param string $my_key Optionnel, la clé représente le type des messages à récupérer
+     * @param string $template Optionnel, Le template représente un message dans une liste
      * @return string
      */
     public function output($my_key = null, $template = '<li class="alert alert-%s" ><button data-dismiss="alert" class="close">&times;</button><strong class="alert-%s">%s</strong> %s</li>')
@@ -72,7 +60,7 @@ class SDIS62_View_Helper_FlashMessenger extends Zend_View_Helper_Abstract  imple
     }
 
     /**
-     * Get messages from flash messenger action helper
+     * Récupère les messages
      *
      * @return array
      */
@@ -84,11 +72,11 @@ class SDIS62_View_Helper_FlashMessenger extends Zend_View_Helper_Abstract  imple
         // Current Messages
         $array_currentMessages = $this->flashMessenger->getCurrentMessages();
 
-        return array_merge($array_currentMessages, $array_messages);
+        return array_unique( array_merge($array_currentMessages, $array_messages) );
     }
 
     /**
-     * Check if there are messages
+     * Contrôle de l'existance ou non de messages dans la pile
      *
      * @return int
      */
@@ -98,7 +86,7 @@ class SDIS62_View_Helper_FlashMessenger extends Zend_View_Helper_Abstract  imple
     }
 
     /**
-     * Implements Countable
+     * Implémente l'interface Countable
      *
      * @return int
      */

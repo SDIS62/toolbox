@@ -1,84 +1,56 @@
 <?php
-/**
-* SDIS 62
-*
-* @category SDIS62
-* @package SDIS62_Model_Mapper_Interface
-*/
 
- /**
-* Interface for mapper class.
-*
-* @category SDIS62
-* @package SDIS62_Model_Mapper_Interface
-*/
 interface SDIS62_Model_Mapper_Interface
 {
-	/**
-	* Insert informations in database and get the primary key
-	*
-	* @params string $type
-	* @params Array $array
-	* @params Array $infos
-	* @return int
-	*/
-	public static function insert($type, $array, $infos);
-	
-	/**
-	* Update informations in database
-	*
-	* @params string $type
-	* @params Array $array
-	* @params Array $infos
-	*/
-	public static function update($type, $array, $infos);
-	
-	/**
-	* Find in database an entity with a specified primary key and extract it
-	*
-	* @params string $type
-	* @params int $id
-	* @params Array $infos
-	* @return Array
-	*/
-	public static function find($type, $id, $infos);
-	
-	/**
-	* Show if there are an entity with a specified primary key in database
-	*
-	* @params string $type
-	* @params int $id
-	* @params Array $infos
-	* @return bool
-	*/
-	public static function exist($type, $id, $infos);
-	
-	/**
-	* Delete informations from database with a specified primary key
-	*
-	* @params string $type
-	* @params int $id
-	* @params Array $infos
-	*/
-	public static function delete($type, $id, $infos);
-	
-	/**
-	* Find in database an entity with a specified foreign key and extract it
-	*
-	* @params string $type
-	* @params Array $condition
-	* @params Array $infos
-	* @return Array
-	*/
-	public static function findByCriteria($type, $condition, $infos);
-	
-	/**
-	* Find in database several entities with a specified foreign key and extract them
-	*
-	* @params string $type
-	* @params Array $condition
-	* @params Array $infos
-	* @return Array
-	*/
-	public static function findAllByCriteria($type, $condition, $infos);
+    /**
+     * Récupération, construction, et envoi d'une entité correspondant à l'id donnée
+     *
+     * @param int $id
+     * @return SDIS62_Model_Proxy_Abstract|null
+     */
+    public function fetchById($id);
+    
+    /**
+     * Récupération, construction, et envoi d'une entité correspondant aux critères spécifiés
+     *
+     * @param string|array $where Optionnel
+     * @param string|array $order Optionnel
+     * @param int $offset Optionnel
+     * @return SDIS62_Model_Proxy_Abstract|null
+     */
+    public function fetchRow($where = null, $order = null, $offset = null);
+
+    /**
+     * Récupération, construction, et envoi d'une liste d'entité correspondants aux critères spécifiés
+     *
+     * @param string|array $where Optionnel
+     * @param string|array $order Optionnel
+     * @param int $count Optionnel
+     * @param int $offset Optionnel
+     * @return array<SDIS62_Model_Proxy_Abstract>|null
+     */
+    public function fetchAll($where = null, $order = null, $count = null, $offset = null);
+    
+    /**
+     * On persiste les données de l'entité (sauvegarde)
+     *
+     * @param SDIS62_Model_Proxy_Abstract $entity Paramètre passé en référence
+     */
+    public function save(SDIS62_Model_Proxy_Abstract &$entity);
+
+    /**
+     * Suppression des données d'une entité identifiée
+     *
+     * @param int $id
+     * @return boolean
+     */
+    public function delete($id);
+
+    /**
+     * Construction et/ou hydratation de l'entité liée au mapper
+     *
+     * @param array $data
+     * @return SDIS62_Model_Proxy_Abstract
+     */    
+    protected function createEntity(array $data);
 }

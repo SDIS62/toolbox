@@ -2,28 +2,61 @@
 
 abstract class SDIS62_Model_Abstract implements SDIS62_Model_Interface_Abstract
 {
+    /**
+     * @var int|string|null $id
+     */
     protected $id;
-      
+
+    /**
+     * Récupération de l'id de l'entité
+     *
+     * @return int|string|null
+     */
     public function getId()
     {
         return $this->id;
     }
 
+    /**
+     * Définition de l'id de l'entité
+     *
+     * @param int|string|null $id
+     * @return SDIS62_Model_Abstract Interface fluide
+     * @throws Zend_Exception Si l'id de l'entité est déjà spécifié (prévention d'une modification de l'identifiant)
+     */
     public function setId($id)
     {
-        $this->id = $id;
+        if($this->getId($id) === null)
+        {
+            $this->id = $id;
+        }
+        else
+        {
+            throw new Zend_Exception("L'id d'une entité ne peut pas être modifié");
+        }
+        
         return $this;
     }
-  
+
+    /**
+     * Extraction de l'entité en un tableau de données
+     *
+     * @return array
+     */
     public function extract()
     {
         $vars = get_object_vars($this);
-        $this->_extract($vars);
+        $this->extractRecursive($vars);
         $vars["classname"] = get_class($this);
         return $vars;
     }
-    
-    public function _extract(&$array)
+
+    /**
+     * Fonction permettant l'extraction d'un objet de façon récursive
+     *
+     * @param array $array Paramètre passé par référence
+     */
+    protected function extractRecursive(array &$array)
     {
         foreach($array as $key => &$var)
         {
@@ -40,11 +73,16 @@ abstract class SDIS62_Model_Abstract implements SDIS62_Model_Interface_Abstract
             }
             elseif(is_array($var))
             {   
-                $this->_extract($var);
+                $this->extractRecursive($var);
             }
         }
     }
     
+    /**
+     * Hrdratation (remplissage) de l'entité à partir d'un tableau de données
+     *
+     * @return SDIS62_Model_Abstract Interface fluide
+     */
     public function hydrate(array $data)
     {
         $this->_hydrate($data);
@@ -60,7 +98,12 @@ abstract class SDIS62_Model_Abstract implements SDIS62_Model_Interface_Abstract
 		return $this;
     }
     
-    private function _hydrate(&$array) 
+    /**
+     * Fonction permettant d'hydrater un objet de façon récursive
+     *
+     * @param array $array Paramètre passé par référence
+     */
+    private function hydrateRecursive(array &$array) 
     {
         if(is_array($array))
         {
@@ -68,7 +111,7 @@ abstract class SDIS62_Model_Abstract implements SDIS62_Model_Interface_Abstract
             {
                 if(is_array($item))
                 {
-                    $this->_hydrate($item);
+                    $this->hydrateRecursive($item);
 
                     if(array_key_exists("classname", $item))
                     {
