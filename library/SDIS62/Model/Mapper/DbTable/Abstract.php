@@ -11,10 +11,11 @@ abstract class SDIS62_Model_Mapper_DbTable_Abstract implements SDIS62_Model_Mapp
     /**
      * Définition de la classe DbTable à utiliser
      *
-     * @param Zend_Db_Table_Abstract $dbTable
+     * @param Zend_Db_Table_Abstract|string $dbTable
      * @return SDIS62_Model_Mapper_DbTable_Abstract Interface fluide
+     * @throws Zend_Exception Si l'objet n'est pas une instance de Zend_Db_Table_Abstract
      */
-    protected function setDbTable($dbTable)
+    public function setDbTable($dbTable)
     {
         if (is_string($dbTable))
         {
@@ -23,7 +24,7 @@ abstract class SDIS62_Model_Mapper_DbTable_Abstract implements SDIS62_Model_Mapp
         
         if (!$dbTable instanceof Zend_Db_Table_Abstract)
         {
-            throw new Exception("L'object n'est pas une instance de type Zend_Db_Table_Abstract");
+            throw new Zend_Exception("L'objet n'est pas une instance de type Zend_Db_Table_Abstract");
         }
         
         $this->dbTable = $dbTable;
@@ -33,11 +34,11 @@ abstract class SDIS62_Model_Mapper_DbTable_Abstract implements SDIS62_Model_Mapp
  
     /**
      * Récupération de la DbTable
-     * Si la DbTable n'est devant être retournée n'est pas du type Zend_Db_Table_Abstract, on la transforme automatiquement
+     * Si la DbTable devant être retournée n'est pas du type Zend_Db_Table_Abstract, on la transforme automatiquement
      *
-     * @return Zend_Db_Table_Abstract
+     * @return Zend_Db_Table_Abstract|null
      */
-    protected function getDbTable()
+    public function getDbTable()
     {
         if (is_string($this->dbTable))
         {
