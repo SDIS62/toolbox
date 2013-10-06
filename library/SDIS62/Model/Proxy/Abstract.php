@@ -179,4 +179,17 @@ abstract class SDIS62_Model_Proxy_Abstract implements SDIS62_Model_Interface_Abs
         
         return $this->getEntity()->hydrate($data);
     }
+    
+    /**
+     * Contrôle si une valeur devant être retournée a été préalablement chargée ou pas
+     *
+     * @param string $method
+     * @param array $args Optionnel
+     * @return boolean
+     */
+    public function isNotLoaded($method, array $args = array())
+    {
+        $value = call_user_func_array(array($this->getEntity(), $method), $args);
+        return $value === ':undefined:' && $this->getId() !== null;
+    }
 }
