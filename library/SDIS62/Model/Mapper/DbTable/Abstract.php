@@ -4,7 +4,7 @@ abstract class SDIS62_Model_Mapper_DbTable_Abstract implements SDIS62_Model_Mapp
 {
     /**
      * La classe DbTable représentant la table mise en jeu dans ce mapper
-     * @var Zend_Db_Table_Abstract
+     * @var Zend_Db_Table_Abstract|string
      */
     protected $dbTable;
     
