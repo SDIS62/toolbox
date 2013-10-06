@@ -6,6 +6,16 @@ abstract class SDIS62_Model_Abstract implements SDIS62_Model_Interface_Abstract
      * @var int|string|null $id
      */
     protected $id;
+    
+    /**
+     * Constructeur (et hydratation de l'entité si le $data est fourni)
+     *
+     * @param array $data Optionnel
+     */
+    public function __construct($data = array())
+    {
+        $this->hydrate($data);
+    }
 
     /**
      * Récupération de l'id de l'entité
@@ -79,7 +89,7 @@ abstract class SDIS62_Model_Abstract implements SDIS62_Model_Interface_Abstract
     }
     
     /**
-     * Hrdratation (remplissage) de l'entité à partir d'un tableau de données
+     * Hydratation (remplissage) de l'entité à partir d'un tableau de données
      *
      * @return SDIS62_Model_Abstract Interface fluide
      */

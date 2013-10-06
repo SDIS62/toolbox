@@ -62,6 +62,16 @@ abstract class SDIS62_Model_Proxy_Abstract implements SDIS62_Model_Interface_Abs
         
 		return $this;
 	}
+    
+    /**
+     * Constructeur (et hydratation de l'entité si le $data est fourni)
+     *
+     * @param array $data Optionnel
+     */
+    public function __construct($data = array())
+    {
+        $this->getEntity()->hydrate($data);
+    }
 
     /**
      * Récupération de l'id de l'entité
