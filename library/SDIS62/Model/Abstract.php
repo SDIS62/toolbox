@@ -95,7 +95,7 @@ abstract class SDIS62_Model_Abstract implements SDIS62_Model_Interface_Abstract
      */
     public function hydrate(array $data)
     {
-        $this->_hydrate($data);
+        $this->hydrateRecursive($data);
     
         foreach($data as $n => $v)
 		{
