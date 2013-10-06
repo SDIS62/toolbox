@@ -7,6 +7,13 @@ abstract class SDIS62_Model_Mapper_DbTable_Abstract implements SDIS62_Model_Mapp
      * @var Zend_Db_Table_Abstract
      */
     protected $dbTable;
+    
+    /**
+     * Tableau mappant le nom des attributs de l'objet et les champs en base de données
+     * Exemple array("attribut de l'entité" => "champs en base")
+     * @var array
+     */
+    protected $map;
 
     /**
      * Définition de la classe DbTable à utiliser
@@ -46,6 +53,89 @@ abstract class SDIS62_Model_Mapper_DbTable_Abstract implements SDIS62_Model_Mapp
         }
         
         return $this->dbTable;
+    }
+    
+    /**
+     * Définition du tableau de mappage des données
+     *
+     * @param array $map
+     * @return SDIS62_Model_Mapper_DbTable_Abstract Interface fluide
+     */
+    public function setMap($map)
+    {
+        $this->map = $map;
+        
+        return $this;
+    }
+ 
+    /**
+     * Récupération du tableau de mappage des données
+     * Si la tableau de mappage est vide, on retourne un tableau vide
+     *
+     * @return array
+     */
+    public function getMap()
+    {
+        if ($this->map === null)
+        {
+            $this->setMap(array());
+        }
+        
+        return $this->map;
+    }
+    
+    /**
+     * Récupération du tableau de mappage des données
+     * Si la tableau de mappage est vide, on retourne un tableau vide
+     *
+     * @param array $data Tableau des données à préparer
+     * @param boolean $dataFromDb Optionnel, Booléen : Si les données à préparer viennent de la base de données (et pas de l'entité)
+     */
+    public function mapData(array $data, $dataFromDb = false)
+    {
+        // On map les nom des champs entre base et entité
+        $map = $dataFromDb ? array_flip($this->getMap()) : $this->getMap();
+
+        foreach($data as $key => $value)
+        {
+            if(array_key_exists($key, $map))
+            {
+                $newkey = $map[$key];
+                $oldkey = $key;
+                
+                $data[$newkey] = $data[$oldkey];
+                unset($data[$oldkey]);
+            }
+        }
+        
+        // On enlève les données non présentes en base et on attribut les données par défaut au tableau
+        if(!$dataFromDb)
+        {
+            $data = array_intersect_key($data, array_flip($this->getDbTable()->info(Zend_Db_Table_Abstract::COLS)));
+            
+            $cols = $this->getDbTable()->info(Zend_Db_Table_Abstract::METADATA);
+            
+            foreach($data as $key => $value)
+            {
+                if($value === null)
+                {
+                    if(array_key_exists($key, $cols) && $cols[$key]["DEFAULT"] !== null)
+                    {
+                        switch($cols[$key]["DEFAULT"])
+                        {
+                            case "CURRENT_TIMESTAMP":
+                                $data[$key] = new Zend_Db_Expr('CURRENT_TIMESTAMP');
+                                break;
+                                
+                            default:
+                                $data[$key] = $cols[$key]["DEFAULT"];
+                        }
+                    }
+                }
+            }
+        }
+        
+        return $data;
     }
     
     /**
