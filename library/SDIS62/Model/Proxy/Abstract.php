@@ -139,7 +139,7 @@ abstract class SDIS62_Model_Proxy_Abstract implements SDIS62_Model_Interface_Abs
         
         // On retourne les datas
         return $data;
-    
+    }
     
     /**
      * Extraction de l'entité dans l'état actuel (l'entité étant lié par le proxy, et donc le lazy load, elle n'est peut être pas entièrement chargée)
