@@ -45,12 +45,4 @@ interface SDIS62_Model_Mapper_Interface
      * @return boolean
      */
     public function delete($id);
-
-    /**
-     * Construction et/ou hydratation de l'entité liée au mapper
-     *
-     * @param array $data
-     * @return SDIS62_Model_Proxy_Abstract
-     */    
-    protected function createEntity(array $data);
 }
