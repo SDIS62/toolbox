@@ -36,7 +36,7 @@ abstract class SDIS62_Model_Abstract implements SDIS62_Model_Interface_Abstract
      */
     public function setId($id)
     {
-        if($this->getId($id) === null)
+        if($this->getId($id) == null)
         {
             $this->id = $id;
         }
@@ -57,12 +57,12 @@ abstract class SDIS62_Model_Abstract implements SDIS62_Model_Interface_Abstract
     {
         $vars = get_object_vars($this);
         $this->extractRecursive($vars);
-        $vars["classname"] = get_class($this);
         return $vars;
     }
 
     /**
      * Fonction permettant l'extraction d'un objet de façon récursive
+     * Ignore les attributs commençants par "related_"
      *
      * @param array $array Paramètre passé par référence
      */
@@ -70,18 +70,28 @@ abstract class SDIS62_Model_Abstract implements SDIS62_Model_Interface_Abstract
     {
         foreach($array as $key => &$var)
         {
-            if(is_object($var))
+            if(substr($key, 0, 8) == 'related_')
             {
-                if($var instanceof SDIS62_Model_Proxy_Abstract)
+                unset($array[$key]);
+                continue;
+            }
+            elseif(is_object($var))
+            {
+                if($var instanceof Doctrine\ORM\PersistentCollection)
                 {
-                    $var = $var->getEntity()->extract();
+                    $var = $var->toArray();
+                }
+                elseif($var instanceof Doctrine\Common\Collections\ArrayCollection)
+                {
+                    $var = $var->toArray();
                 }
                 else
                 {
                     $var = $var->extract();
                 }
             }
-            elseif(is_array($var))
+            
+            if(is_array($var))
             {   
                 $this->extractRecursive($var);
             }
