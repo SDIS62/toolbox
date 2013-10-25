@@ -1,9 +1,9 @@
-# SDIS62 : Toolbox
+# SDIS62 Toolbox
 
 ## Description
 
-C'est la boite à outils pour les développements du SDIS 62.
+C'est la boite à outils (librairie étendant les fonctionnalités de Zend framework 1.*) pour les développements du SDIS62.
 
-## Documentation
+## Ressources
 
-(Documentation en cours ...)
+* [Bug tracker](https://github.com/SDIS62/toolbox/issues)
