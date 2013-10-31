@@ -57,6 +57,12 @@ abstract class SDIS62_Model_Abstract implements SDIS62_Model_Interface_Abstract
     {
         $vars = get_object_vars($this);
         $this->extractRecursive($vars);
+                
+        // On enlève les données parasites
+        unset($vars["__initializer__"]);
+        unset($vars["__cloner__"]);
+        unset($vars["__isInitialized__"]);
+        
         return $vars;
     }
 
