@@ -57,7 +57,7 @@ abstract class SDIS62_Model_Abstract implements SDIS62_Model_Interface_Abstract
     {
         $vars = get_object_vars($this);
         $this->extractRecursive($vars);
-                
+        
         // On enlève les données parasites
         unset($vars["__initializer__"]);
         unset($vars["__cloner__"]);
@@ -86,10 +86,15 @@ abstract class SDIS62_Model_Abstract implements SDIS62_Model_Interface_Abstract
                 if($var instanceof Doctrine\ORM\PersistentCollection)
                 {
                     $var = $var->toArray();
+                    
                 }
                 elseif($var instanceof Doctrine\Common\Collections\ArrayCollection)
                 {
                     $var = $var->toArray();
+                }
+                elseif($var instanceof \DateTime)
+                {
+                    $var = $var->format('Y-m-d');
                 }
                 else
                 {
