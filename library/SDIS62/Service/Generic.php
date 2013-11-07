@@ -75,6 +75,7 @@ class SDIS62_Service_Generic
     {
         if (null === $this->rest_client) {
             $this->setRestClient(new Zend_Rest_Client());
+            $this->rest_client->setUri($this->getUri());
         }
         return $this->rest_client;
     }
@@ -88,8 +89,7 @@ class SDIS62_Service_Generic
      */
     public function request($method, array $args = array())
     {
-        $client = new Zend_Rest_Client();
-        $client->setUri($this->getUri());
+        $client = $this->getRestClient();
         call_user_func_array(array($client, $method), $args);
         
         return Zend_Json::Decode($client->get());
