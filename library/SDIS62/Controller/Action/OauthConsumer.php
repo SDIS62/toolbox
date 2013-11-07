@@ -3,117 +3,91 @@
 class SDIS62_Controller_Action_OauthConsumer extends Zend_Controller_Action
 {
     /**
-     * Default Zend_Oauth_Consumer object.
+     * Zend_Oauth_Consumer
      *
-     * @var Zend_Oauth_Consumer
+     * @var Zend_Oauth_Consumer|null
      */
-	private $consumer = null;
+	private $consumer;
     
     /**
-     * The configuration file.
+     * Le chemin vers le fichier de configuration
+     * Par défaut, le fichier de configuation doit se trouver dans application/configs/secret.ini
      *
-     * @var string
+     * @var string|null
      */
-	protected $config_file = null;
-    
-    /**
-     * Array which represents the redirection URL after obtain an access token. ($action, $controller = null, $module = null, array $params = array())
-     *
-     * @var array
-     */
-	protected $stock_access_token_url = array("index", "index");
+	protected $config_path;
 
     /**
-     * Initialize object
-     *
-     * @return void
+     * Initialisation du controleur
      */
     public function init()
     {
-        if($this->config_file == null)
-        {
-            $this->config_file = new Zend_Config_Ini(APPLICATION_PATH . DIRECTORY_SEPARATOR . "configs" . DIRECTORY_SEPARATOR . "secret.ini", APPLICATION_ENV);
-        }
-
-        // retrieve the configuration from config_file
-        $secret_oauth_config = array(
-            'callbackUrl' => $this->config_file->oauth->callback,
-            'siteUrl' => $this->config_file->oauth->siteurl,
-			'consumerKey' => $this->config_file->oauth->consumerkey, // consumer key
-			'consumerSecret' => $this->config_file->oauth->consumersecret // consumer secret
+        // Récupération du fichier de config
+        $config = new Zend_Config_Ini(
+            $this->config_path == null ? APPLICATION_PATH . DS . "configs" . DS . "secret.ini" : $config_path,
+            APPLICATION_ENV
         );
 
-        // Initialize consumer object with config array
-		$this->consumer = new Zend_Oauth_Consumer($secret_oauth_config);
+        // Initialisation du consumer
+		$this->setConsumer(new Zend_Oauth_Consumer(array(
+            'callbackUrl' => $config->oauth->callback,
+            'siteUrl' => $config->oauth->siteurl,
+			'consumerKey' => $config->oauth->consumerkey,
+			'consumerSecret' => $config->oauth->consumersecret
+        )));
+    }
+    
+    /**
+     * Récupération du consumer oauth
+     *
+     * @return Zend_Oauth_Consumer|null
+     */
+    protected function getConsumer()
+    {
+        return $this->consumer;
+    }
+    
+    /**
+     * Définition du consumer oauth
+     *
+     * @param Zend_Oauth_Consumer $consumer
+     */
+    private function setConsumer(Zend_Oauth_Consumer $consumer)
+    {
+        $this->consumer = $consumer;
     }
 
     /**
-     * Dispatch to retrieve a request_token
-     *
-     * @return void
+     * Dispatch pour récupérer un request_token
      */
     public function indexAction()
     {
-        // If there is a identity with an access token
-        $auth = Zend_Auth::getInstance();
-        
-        // If we have an access token, redirect
-        if($auth->hasIdentity() && isset($auth->getIdentity()->ACCESS_TOKEN))
-        {
-            $this->_helper->redirector("index", "index");
-        }
-        
-        // get my session
-		$session = new Zend_Session_Namespace();
+        // Récupération du request_token
+        $_SESSION['request_token'] = serialize($this->getConsumer()->getRequestToken());
 
-        // Get request_token
-        $token = $this->consumer->getRequestToken();
-
-        // we store the request token
-        $session->REQUEST_TOKEN = $token;
-
-        // redirect the user to user module
-        $this->consumer->redirect();
-        
-        return;
+        // Redirection vers la page d'authentification
+        $this->getConsumer()->redirect();
     }
 
     /**
-     * Dispatch to retrieve an access_token
-     *
-     * @return void
+     * Dispatch pour récupérer un access_token
      */
     public function callbackAction()
     {
-        // get my session
-		$session = new Zend_Session_Namespace();
+        $request_token = unserialize($_SESSION['request_token']);
+        $_SESSION['request_token'] = null;
         
-        // Test if the request token matches with the request token received in step 1
-        if($this->getParam("oauth_token") == $session->REQUEST_TOKEN->oauth_token)
+        // On test si le request token correspond avec celui reçu à la première étape
+        if($this->getParam("oauth_token") != $request_token->oauth_token)
         {
-            // Get access token
-            $token = $this->consumer->getAccessToken(
-                $_GET,
-                $session->REQUEST_TOKEN
-            );
-            
-            // Serialize and stock access token in session
-            $session->ACCESS_TOKEN = serialize($token);
-
-            // Now that we have an Access Token, we can discard the Request Token
-            $session->REQUEST_TOKEN = null;
-            
-            // redirection
-            $this->_helper->redirector->gotoSimple(
-               $this->stock_access_token_url[0],
-                array_key_exists(1, $this->stock_access_token_url) ? $this->stock_access_token_url[1] : null,
-                array_key_exists(2, $this->stock_access_token_url) ? $this->stock_access_token_url[2] : null,
-                array_key_exists(3, $this->stock_access_token_url) && is_array($this->stock_access_token_url[3]) ? $this->stock_access_token_url[3] : array()
-           );
+            throw new Exception("Les request_token ne correspondent pas ! (" . $this->getParam("oauth_token") . 
+                " != " . $request_token->oauth_token . ")", 500);
         }
-        else
-        {
-            throw new Exception("Bad Token.", 500);
-        }
+        
+        // Récupération de l'access_token
+        $access_token = $this->getConsumer()->getAccessToken($_GET, $request_token);
+        
+        // Stockage de l'access_token
+        $_SESSION['access_token'] = serialize($access_token);
     }
 }
