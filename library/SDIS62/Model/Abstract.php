@@ -94,7 +94,7 @@ abstract class SDIS62_Model_Abstract implements SDIS62_Model_Interface_Abstract
                 }
                 elseif($var instanceof \DateTime)
                 {
-                    $var = $var->format('Y-m-d');
+                    $var = $var->format('H:i:s') == "00:00:00" ? $var->format('Y-m-d') : $var->format('Y-m-d H:i:s');
                 }
                 else
                 {
@@ -154,5 +154,15 @@ abstract class SDIS62_Model_Abstract implements SDIS62_Model_Interface_Abstract
                 }
             }
         }
+    }
+    
+    /**
+     * Conversion de l'objet en chaine de caractères
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return strval($this->id);
     }
 }
