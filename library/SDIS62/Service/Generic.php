@@ -3,27 +3,82 @@
 class SDIS62_Service_Generic
 {
     /**
+     * URL de base de l'API
+     *
      * @var string
      */
     protected $uri;
-    
+
     /**
-     * @var Zend_Rest_Client
+     * @var array
      */
-    protected $rest_client;
+    protected $cookieJar;
+
+    /**
+     * @var Zend_Http_Client
+     */
+    protected $httpClient = null;
+
+    /**
+     * Options passées au constructeur
+     *
+     * @var array
+     */
+    protected $options = array();
 
     /**
      * Constructeur
      *
-     * @param string $uri Uri de l'API à interroger
-     * @param string $api_key Optionnel, Clé pour interroger l'API
-     * @return void
+     * @param string $uri URL de base de l'API
+     * @param  null|array|Zend_Config $options
+     * @param  null|Zend_Http_Client $httpClient
      */
-    public function __construct($uri, $api_key = null)
+    public function __construct($uri, $options = null, Zend_Http_Client $httpClient = null)
     {
         $this->setUri($uri);
-    }
+        
+        if ($options instanceof Zend_Config)
+        {
+            $options = $options->toArray();
+        }
+        
+        if (!is_array($options))
+        {
+            $options = array();
+        }
 
+        $this->options = $options;
+
+        $httpClientOptions = array();
+        
+        if(isset($options['httpClientOptions']))
+        {
+            $httpClientOptions = $options['httpClientOptions'];
+        }
+        elseif(isset($options['http_client_options']))
+        {
+            $httpClientOptions = $options['http_client_options'];
+        }
+
+        if(isset($options['httpClient']) && null === $httpClient)
+        {
+            $httpClient = $options['httpClient'];
+        }
+        elseif(isset($options['http_client']) && null === $httpClient)
+        {
+            $httpClient = $options['http_client'];
+        }
+        
+        if($httpClient instanceof Zend_Http_Client)
+        {
+            $this->httpClient = $httpClient;
+        }
+        else
+        {
+            $this->setHttpClient(new Zend_Http_Client(null, $httpClientOptions));
+        }
+    }
+    
     /**
      * Récupération de l'Uri
      *
@@ -38,7 +93,6 @@ class SDIS62_Service_Generic
      * Définition de l'Uri
      *
      * @param string $uri
-     * @return SDIS62_Service_Abstract
      * @throws Zend_Service_Exception si l'uri est invalide
      */
     public function setUri($uri)
@@ -49,63 +103,135 @@ class SDIS62_Service_Generic
         }
 
         $this->uri = $uri;
-        return $this;
     }
-    
+
     /**
-     * Définition du client REST
+     * Définition du client HTTP
      *
-     * @param Zend_Rest_Client $rest_client
+     * @param Zend_Http_Client $client
      * @return self
      */
-    public function setRestClient(Zend_Rest_Client $rest_client)
+    public function setHttpClient(Zend_Http_Client $client)
     {
-        $this->rest_client = $rest_client;
+        $this->httpClient = $client;
+        $this->httpClient->setHeaders(array('Accept-Charset' => 'utf-8'));
         return $this;
     }
 
     /**
-     * Récupération du client REST
+     * Récupération du client HTTP
      *
-     * "Lazy loads" si aucun n'est présent
+     * Lazy loads si il n'existe pas
      *
      * @return Zend_Http_Client
      */
-    public function getRestClient()
+    public function getHttpClient()
     {
-        if (null === $this->rest_client) {
-            $this->setRestClient(new Zend_Rest_Client());
-            $this->rest_client->setUri($this->getUri());
+        if (null === $this->httpClient)
+        {
+            $this->setHttpClient(new Zend_Http_Client());
         }
-        return $this->rest_client;
+        
+        return $this->httpClient;
     }
 
     /**
-     * Envoi d'une requête
+     * Request
      *
-     * @param string $method
-     * @param array  $args
-     * @return mixed
+     * @param string $path
+     * @param array $query Tableau des paramètres GET
+     * @param string $method GET ou POST
+     * @throws Zend_Exception Si la méthode n'est pas bonne
+     * @throws Zend_Http_Client_Exception Si la requête HTTP a failli
+     * @throws Exception\DomainException Si le JSON n'est pas correct
+     * @return Zend_Service_Twitter_Response
      */
-    public function request($method, array $args = array())
+    public function request($path, $query = array(), $method = 'GET')
     {
-        $client = $this->getRestClient();
-        call_user_func_array(array($client, $method), $args);
+        switch(strtolower($method))
+        {
+            case 'get':
+                $response = $this->get($path, $query);
+                break;
+            case 'post':
+                $response = $this->post($path, $query);
+                break;
+            default:
+                throw new Zend_Exception('La méthode n\'est pas connue.', 500);
+        }
         
-        return Zend_Json::Decode($client->get());
+        return new SDIS62_Service_Generic_Response($response);
     }
-    
+
     /**
-     * Surcharge de la fonction __call
-     * Permet d'appeler une fonction directement.
-     * request("method", array(5, 6)) = method(5, 6)
+     * Appel un service REST
      *
-     * @param string $method
-     * @param array $args
-     * @return mixed
+     * @param  string $path La destination a mettre juste après l'uri de l'API
+     * @param  Zend_Http_Client $client
+     * @throws Zend_Http_Client_Exception
+     * @return void
      */
-    public function __call($method, $args)
+    protected function prepare($path, Zend_Http_Client $client)
     {
-        return $this->request($method, $args);
+        $client->setUri($this->uri . '/' . $path);
+        $client->resetParameters();
+    }
+
+    /**
+     * Réalise une requête GET
+     *
+     * @param string $path
+     * @param array  $query
+     * @throws Zend_Http_Client_Exception
+     * @return Zend_Http_Response
+     */
+    protected function get($path, array $query = array())
+    {
+        $client = $this->getHttpClient();
+        $this->prepare($path, $client);
+        $client->setParameterGet($query);
+        $response = $client->request(Zend_Http_Client::GET);
+        return $response;
+    }
+
+    /**
+     * Réalise une requête POST
+     *
+     * @param string $path
+     * @param mixed $data
+     * @throws Zend_Http_Client_Exception
+     * @return Zend_Http_Response
+     */
+    protected function post($path, $data = null)
+    {
+        $client = $this->getHttpClient();
+        $this->prepare($path, $client);
+        $response = $this->performPost(Zend_Http_Client::POST, $data, $client);
+        return $response;
+    }
+
+    /**
+     * Réalise un POST ou un PUT
+     *
+     * Effectue une requête POST ou PUT. Toutes les données fournies sont définis dans le client HTTP.
+     * Les données de type string sont poussées en tant que données brutes POST;
+     * Les tableaux ou objets sont poussés en tant que paramètres POST.
+     *
+     * @param mixed $method
+     * @param mixed $data
+     * @return Zend_Http_Response
+     */
+    protected function performPost($method, $data, Zend_Http_Client $client)
+    {
+        if (is_string($data))
+        {
+            $client->setRawData($data);
+        }
+        elseif (is_array($data) || is_object($data))
+        {
+            $client->setParameterPost((array) $data);
+        }
+        
+        return $client->request($method);
     }
 }
