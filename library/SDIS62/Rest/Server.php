@@ -6,13 +6,17 @@ class SDIS62_Rest_Server extends Zend_Rest_Server
      * Implement Zend_Server_Interface::handle()
      *
      * @param  array $request
+     * @param  array $headers
      * @throws Zend_Rest_Server_Exception
      * @return string|void
      */
-    public function handle($request = false)
-    {
-        // On annonce qu'on va envoyer du Json
-        $this->_headers = array('Content-Type: application/json');
+    public function handle($request = false, $headers = null, $isJson = true)
+    { 
+        if ($headers === null) {
+            // Par défaut, on annonce qu'on va envoyer du Json
+            $headers = array('Content-Type: application/json');
+        }
+        $this->_headers = $headers;
         
         // On paramètre le detecteur de mise en défaut
         $failed = false;
@@ -126,12 +130,16 @@ class SDIS62_Rest_Server extends Zend_Rest_Server
             $result = $this->fault(new Zend_Rest_Server_Exception("No Method Specified."), 404);
             $failed = true;
         }
+        if ($isJson || $failed) {
+            // On parse la réponse en json
+            $response = Zend_Json::Encode(array(
+                'response' => $result,
+                'status' => $failed ? 'failed' : 'success'
+            ));
+        } else {
+            $response = '';
+        }
         
-        // On parse la réponse en json
-        $response = Zend_Json::Encode(array(
-            'response' => $result,
-            'status' => $failed ? 'failed' : 'success'
-        ));
 
         // On gère la fonction returnResponse()
         if (!$this->returnResponse()) {
