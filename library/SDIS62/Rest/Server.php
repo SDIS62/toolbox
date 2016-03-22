@@ -6,17 +6,21 @@ class SDIS62_Rest_Server extends Zend_Rest_Server
      * Implement Zend_Server_Interface::handle()
      *
      * @param  array $request
-     * @param  array $headers
+     * @param  array $response_header       Header précisé en entré de fonction (null par défaut pour la rétrocompatiblité)
+     * @param  bool  $json_response         Le retour de la réponse est en JSON si le paramètre est à true (rétrocompatiblité)
      * @throws Zend_Rest_Server_Exception
      * @return string|void
      */
-    public function handle($request = false, $headers = null, $isJson = true)
-    { 
-        if ($headers === null) {
-            // Par défaut, on annonce qu'on va envoyer du Json
-            $headers = array('Content-Type: application/json');
+    public function handle($request = false, $response_header = null, $json_response = true)
+    {
+        if ($response_header === null) {
+            // Si aucun header de préciser, on annonce qu'on va envoyer du Json
+            // (Rétrocompatibilité)
+            $response_header = array('Content-Type: application/json');
+            // On force $json_response à true si modifié, mais aucun autre header
+            $json_response = true;
         }
-        $this->_headers = $headers;
+        $this->_headers = $response_header;
         
         // On paramètre le detecteur de mise en défaut
         $failed = false;
@@ -130,12 +134,14 @@ class SDIS62_Rest_Server extends Zend_Rest_Server
             $result = $this->fault(new Zend_Rest_Server_Exception("No Method Specified."), 404);
             $failed = true;
         }
-        if ($isJson || $failed) {
-            // On parse la réponse en json
-            $response = Zend_Json::Encode(array(
+        
+        // Si la réponse attendu est en JSON, ou le résultat à failed,
+        // on parse la réponse en json
+        if ($failed || $json_response) {
+                $response = Zend_Json::Encode(array(
                 'response' => $result,
                 'status' => $failed ? 'failed' : 'success'
-            ));
+            ));    
         } else {
             $response = '';
         }
