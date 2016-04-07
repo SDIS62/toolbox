@@ -2,31 +2,54 @@
 
 class SDIS62_Rest_Server extends Zend_Rest_Server
 {
+
+    private $_jsonResponse = true;
+
+    /**
+     * Change les headers par défaut
+     * 
+     * @param array     $headers    Header sous forme de tableau
+     */
+    public function setHeaders($headers)
+    {
+        if ($headers && is_array($headers)) {
+            $this->_headers = $headers;
+        }
+        
+    }
+
+    /**
+     * Change la valeur de jsonResponse 
+     * (true : renvoie des informations json / false : n'en renvoie pas)
+     * 
+     * @param bool      $isJsonResponse     La valeur de json Response
+     */
+    public function setJsonResponse($isJsonResponse)
+    {
+        $this->_jsonResponse = $isJsonResponse;
+    }
+
+
     /**
      * Implement Zend_Server_Interface::handle()
      *
      * @param  array $request
-     * @param  array $response_header       Header précisé en entré de fonction (null par défaut pour la rétrocompatiblité)
-     * @param  bool  $json_response         Le retour de la réponse est en JSON si le paramètre est à true (rétrocompatiblité)
      * @throws Zend_Rest_Server_Exception
      * @return string|void
      */
-    public function handle($request = false, $response_header = null, $json_response = true)
+    public function handle($request = false)
     {
-        if ($response_header === null) {
-            // Si aucun header de préciser, on annonce qu'on va envoyer du Json
-            // (Rétrocompatibilité)
-            $response_header = array('Content-Type: application/json');
-            // On force $json_response à true si modifié, mais aucun autre header
-            $json_response = true;
+        // Si aucun header de préciser, on annonce qu'on va envoyer du Json
+        // (Rétrocompatibilité)
+        if ( ! $this->_headers || empty($this->_headers)) {
+            $this->_headers = array('Content-Type: application/json');
         }
-        $this->_headers = $response_header;
         
         // On paramètre le detecteur de mise en défaut
         $failed = false;
         
         // Copié collé de Zend_Rest_Server::handle() ... (mais un peu custom quand même !)
-        if (!$request)
+        if (!$request) 
         {
             $request = $_REQUEST;
         }
@@ -137,7 +160,7 @@ class SDIS62_Rest_Server extends Zend_Rest_Server
         
         // Si la réponse attendu est en JSON, ou le résultat à failed,
         // on parse la réponse en json
-        if ($failed || $json_response) {
+        if ($failed || $this->_jsonResponse) {
                 $response = Zend_Json::Encode(array(
                 'response' => $result,
                 'status' => $failed ? 'failed' : 'success'
