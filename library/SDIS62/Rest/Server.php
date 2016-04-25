@@ -2,6 +2,34 @@
 
 class SDIS62_Rest_Server extends Zend_Rest_Server
 {
+
+    private $_jsonResponse = true;
+
+    /**
+     * Change les headers par défaut
+     * 
+     * @param array     $headers    Header sous forme de tableau
+     */
+    public function setHeaders($headers)
+    {
+        if ($headers && is_array($headers)) {
+            $this->_headers = $headers;
+        }
+        
+    }
+
+    /**
+     * Change la valeur de jsonResponse 
+     * (true : renvoie des informations json / false : n'en renvoie pas)
+     * 
+     * @param bool      $isJsonResponse     La valeur de json Response
+     */
+    public function setJsonResponse($isJsonResponse)
+    {
+        $this->_jsonResponse = $isJsonResponse;
+    }
+
+
     /**
      * Implement Zend_Server_Interface::handle()
      *
@@ -11,14 +39,17 @@ class SDIS62_Rest_Server extends Zend_Rest_Server
      */
     public function handle($request = false)
     {
-        // On annonce qu'on va envoyer du Json
-        $this->_headers = array('Content-Type: application/json');
+        // Si aucun header de préciser, on annonce qu'on va envoyer du Json
+        // (Rétrocompatibilité)
+        if ( ! $this->_headers || empty($this->_headers)) {
+            $this->_headers = array('Content-Type: application/json');
+        }
         
         // On paramètre le detecteur de mise en défaut
         $failed = false;
         
         // Copié collé de Zend_Rest_Server::handle() ... (mais un peu custom quand même !)
-        if (!$request)
+        if (!$request) 
         {
             $request = $_REQUEST;
         }
@@ -127,11 +158,17 @@ class SDIS62_Rest_Server extends Zend_Rest_Server
             $failed = true;
         }
         
-        // On parse la réponse en json
-        $response = Zend_Json::Encode(array(
-            'response' => $result,
-            'status' => $failed ? 'failed' : 'success'
-        ));
+        // Si la réponse attendu est en JSON, ou le résultat à failed,
+        // on parse la réponse en json
+        if ($failed || $this->_jsonResponse) {
+                $response = Zend_Json::Encode(array(
+                'response' => $result,
+                'status' => $failed ? 'failed' : 'success'
+            ));    
+        } else {
+            $response = '';
+        }
+        
 
         // On gère la fonction returnResponse()
         if (!$this->returnResponse()) {
